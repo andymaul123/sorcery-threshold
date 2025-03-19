@@ -54,7 +54,7 @@ export function generateCombinations(criteria, cardArray) {
 
     // This is the meat and potatoes. It is a brute force loop that will go through every combination and log if there's a match
     // New matches are added to the array mid-loop, so it will feed itself until its exhausted every combination
-    const safetyValue = 200;
+    const safetyValue = 300;
     let iterations = 0;
     for (let combinationsArrayIndex = 0; combinationsArrayIndex < combinationsArray.length; combinationsArrayIndex++) {
         iterations++;

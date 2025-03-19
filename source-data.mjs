@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
+import { wildCards } from './wild-cards.mjs';
 
-export function readAndTransformRawData() {
+export function readAndTransformRawData(useWildCards) {
   const cards = readFileSync('./sorcery-cards.json', 'utf8', (err, cards) => {
     if (err) throw err;
   });
@@ -12,7 +13,11 @@ export function readAndTransformRawData() {
     if(cardData[index].guardian.type == "Site"){
       const cardName = normalizeName(cardData[index].name);
       let symbolString = "";
-      for (const key in cardData[index].guardian.thresholds) {
+      if(useWildCards && wildCards.includes(cardName)) {
+        symbolString = "aefw";
+      }
+      else {
+        for (const key in cardData[index].guardian.thresholds) {
           if (Object.prototype.hasOwnProperty.call(cardData[index].guardian.thresholds, key)) {
               if(cardData[index].guardian.thresholds[key] > 0) {
                   for (let j = 0; j < Number(cardData[index].guardian.thresholds[key]); j++) {
@@ -21,6 +26,7 @@ export function readAndTransformRawData() {
               }
               
           }
+        }
       }
       symbolMap[cardName] = symbolString;
     }
@@ -30,7 +36,6 @@ export function readAndTransformRawData() {
 }
 
 export function writeParsedData(data) {
-  console.log(data);
   writeFileSync('threshold-data.json', JSON.stringify(data), 'utf8', () => {
     console.log(`Writing contents to ./threshold-data.json`);
   });
@@ -85,6 +90,19 @@ export function convertDeckListToSymbols(input) {
 
 function normalizeName(name) {
   return name.toLowerCase().replace(/ /g,"_");
+}
+
+export function saveCriteria(criteria) {
+  console.log(`Saving threshold criteria to ./criteria.json. Delete when done.`);
+  writeFileSync('criteria.json', JSON.stringify(criteria), 'utf8', () => {});
+}
+
+export function loadCriteria() {
+  try {
+      return readFileSync('./criteria.json', 'utf8', (err, data) => {return data;});
+  } catch (error) {
+      return undefined;
+  }
 }
 
 

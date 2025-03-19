@@ -1,8 +1,16 @@
 
 import { parseArgs } from 'node:util';
-import { getThresholdData, readAndTransformRawData, writeParsedData, getListOfSites, convertDeckListToSymbols } from "./prepRawData.mjs";
-import { generateCombinations } from './generateCombinations.mjs';
-import { deriveProbability } from "./deriveProbability.mjs";
+import { 
+  getThresholdData, 
+  readAndTransformRawData, 
+  writeParsedData, 
+  getListOfSites, 
+  convertDeckListToSymbols,
+  saveCriteria, 
+  loadCriteria
+} from "./source-data.mjs";
+import { generateCombinations } from './generate-combinations.mjs';
+import { deriveProbability } from "./derive-probability.mjs";
 import { simulateProbability } from "./simulate-probability.mjs";
 import { number } from '@inquirer/prompts';
 import chalk from 'chalk';
@@ -19,33 +27,52 @@ const options = {
     'drawCount': {
       type: 'string'
     },
+    'wild': {
+      type: 'boolean'
+    },
+    'forceNew': {
+      type: 'boolean'
+    },
+    'save': {
+      type: 'boolean'
+    },
   };
 
 const { values: flags } = parseArgs({ args, options, allowPositionals: true });
 
 async function prompt() {
   console.log(`Enter the desired threshold count for each element.`);
-  const symbolEarth = '\u{1F703}';
-  const symbolAir = '\u{1F701}';
-  const symbolFire = '\u{1F702}';
-  const symbolWater = '\u{1F704}';
-
-  let criteriaObject = {};
-
-  criteriaObject.earth = await number({ message: chalk.green(`${symbolEarth} Earth Threshold`) });
-  criteriaObject.air = await number({ message: chalk.cyan(`${symbolAir} Air Threshold`) });
-  criteriaObject.fire = await number({ message: chalk.red(`${symbolFire} Fire Threshold`) });
-  criteriaObject.water = await number({ message: chalk.blue(`${symbolWater} Water Threshold`) });
-
   let criteriaArray = [];
-
-  for (const key in criteriaObject) {
-    if (Object.prototype.hasOwnProperty.call(criteriaObject, key)) {
-      for (let index = 0; index < criteriaObject[key]; index++) {
-        criteriaArray.push(key.substring(0,1));
+  const loadedCriteria = loadCriteria();
+  if(loadedCriteria) {
+    console.log(`Saved criteria found`);
+    criteriaArray = JSON.parse(loadedCriteria);
+  }
+  else {
+    const symbolEarth = '\u{1F703}';
+    const symbolAir = '\u{1F701}';
+    const symbolFire = '\u{1F702}';
+    const symbolWater = '\u{1F704}';
+  
+    let criteriaObject = {};
+  
+    criteriaObject.earth = await number({ message: chalk.green(`${symbolEarth} Earth Threshold`) });
+    criteriaObject.air = await number({ message: chalk.cyan(`${symbolAir} Air Threshold`) });
+    criteriaObject.fire = await number({ message: chalk.red(`${symbolFire} Fire Threshold`) });
+    criteriaObject.water = await number({ message: chalk.blue(`${symbolWater} Water Threshold`) });
+  
+    for (const key in criteriaObject) {
+      if (Object.prototype.hasOwnProperty.call(criteriaObject, key)) {
+        for (let index = 0; index < criteriaObject[key]; index++) {
+          criteriaArray.push(key.substring(0,1));
+        }
       }
     }
+    if(flags.save) {
+      saveCriteria(criteriaArray.sort());
+    }
   }
+
 
   init(criteriaArray.sort());
 }
@@ -54,9 +81,11 @@ async function prompt() {
 function init(criteria) {
     // Step 1: Ensure there is threshold data to work with, otherwise create it using the provided sorcery-cards.json
     const thresholdData = getThresholdData();
-    if(!thresholdData) {
-        console.log(`threshold-data.json not found, creating it...`);
-        const rawData = readAndTransformRawData();
+    if(flags.forceNew || !thresholdData) {
+        const forceMessage = `Re-creating threshold-data.json`;
+        const newMessage = `Creating threshold-data.json`;
+        console.log(flags.forceNew ? forceMessage : newMessage);
+        const rawData = readAndTransformRawData(flags.wild, flags.forceNew);
         writeParsedData(rawData);
     }
 
@@ -79,14 +108,14 @@ function init(criteria) {
     // Step 4: Feed the possible success combinations into the probability equations
 
     let odds;
-    if(flags.simulation) {
+    if(flags.simulate) {
         odds = simulateProbability(siteDeckSymbols, possibleSuccessCombinations, flags.iterations, flags.drawCount);
     }
     else {
         odds = deriveProbability(siteDeckSymbols, possibleSuccessCombinations);
     }
 
-    console.log(`Odds of getting ${criteria} in a draw of ${criteria.length} is ${odds}`);
+    console.log(`Odds of getting ${criteria} in a draw of ${flags.drawCount ? flags.drawCount : criteria.length} is ${odds}`);
 
 }
 

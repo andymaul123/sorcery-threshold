@@ -131,3 +131,7 @@ dist
 
 # scss
 .sass-cache
+
+# specific
+threshold-data.json
+criteria.json
