@@ -1,47 +1,20 @@
-export function generateCombinations(criteria, cardArray) {
+/**
+ * Generates all possible combinations that would satisfy a given criteria
+ * @param {Array<String>} criteria
+ * @param {Array<String>} siteDeckSymbols
+ * @returns {Array<String>} 
+ */
 
-    // expandedCriteria is an object that lists the counts of each unique symbol in the *criteria array*, e.g. {a:1, e:2, w:1}
-    let expandedCriteria = {};
-    for (let index = 0; index < criteria.length; index++) {
-        if(!expandedCriteria.hasOwnProperty(criteria[index]))
-        expandedCriteria[criteria[index]] = criteria.filter((letter) => letter == criteria[index]).length
-    }
+export function generateCombinations(criteria, siteDeckSymbols) {
 
-    // Reduce the available options to the maximum possible, e.g. there will only ever be one 'a' symbol used in a set, but two 'e' symbols
-    // This will be used later to help prevent sets with illegal combinations like [aew, aew, aew, aew]
-    let reducedCardArray = [];
-    for (let index = 0; index < cardArray.length; index++) {
-        // exact matches, e.g. basic sites with one threshold
-        if(expandedCriteria.hasOwnProperty(cardArray[index])) {
-            if(reducedCardArray.filter((letter) => cardArray[index] == letter).length < expandedCriteria[cardArray[index]]) {
-                reducedCardArray.push(cardArray[index]);
-            }
-        } 
-        // multi-colored sites and others
-        else {
-            let includeCount = 0;
-            for (let j = 0; j < criteria.length; j++) {
-                if(cardArray[index].includes(criteria[j])) {
-                    includeCount++;
-                }
-            }
-            if(includeCount > 0 && reducedCardArray.filter((letter) => letter == cardArray[index]).length < includeCount) {
-                reducedCardArray.push(cardArray[index]);
-            }
-        }
-    }
-    reducedCardArray.sort();
-
-    // Same as above, we make an "expanded" object with counts for each unique symbol in the *deck list*, e.g. {a:6, e:9, w:4, ...}
-    let expandedSymbolCountObject = {};
-    for (let index = 0; index < reducedCardArray.length; index++) {
-        if(!expandedSymbolCountObject.hasOwnProperty(reducedCardArray[index]))
-        expandedSymbolCountObject[reducedCardArray[index]] = reducedCardArray.filter((letter) => letter == reducedCardArray[index]).length
-    }
+    const criteriaFrequencyMap = createFrequencyMap(criteria);
+    const reducedSiteDeckSymbols = reduceSiteDeckSymbols(criteria, criteriaFrequencyMap, siteDeckSymbols);
+    const decklistFrequencyMap = createFrequencyMap(reducedSiteDeckSymbols);
     
     let matchCount = 0;
-    let combinationsArray = [];
-    let combinationSignatureArray = [];
+    const combinationsArray = [];
+    const combinationSignatureArray = [];
+    const safetyValue = 300;
 
     // Seed the first combinations array with the criteria
     combinationsArray.push(criteria);
@@ -53,28 +26,34 @@ export function generateCombinations(criteria, cardArray) {
     combinationSignatureArray.push(criteria.join(","));
 
     // This is the meat and potatoes. It is a brute force loop that will go through every combination and log if there's a match
-    // New matches are added to the array mid-loop, so it will feed itself until its exhausted every combination
-    const safetyValue = 300;
+    // New matches are added to the array mid-loop, so it will feed itself until its exhausted every combination or it hits the safetyValve number
+
     let iterations = 0;
+    // For each item in the combinationsArray, e.g. [ [a,e,e,w], [...], ... ]
     for (let combinationsArrayIndex = 0; combinationsArrayIndex < combinationsArray.length; combinationsArrayIndex++) {
         iterations++;
         if(iterations >= safetyValue) {
             console.log(`Possible combinations has exceeded the safety value, which prevents infinite looping. Please increase the safety value and run again.`);
             return;
         }
+        // For each value in a given combinationsArray item array, e.g. [a,e,e,w]
         for (let selectedCombinationIndex = 0; selectedCombinationIndex < combinationsArray[combinationsArrayIndex].length; selectedCombinationIndex++) {
             // we're now nested down to the individual letter, e.g. "a" or "e"
-            for (let index = 0; index < reducedCardArray.length; index++) {
-                if(reducedCardArray[index] == combinationsArray[combinationsArrayIndex][selectedCombinationIndex]) {
-                    // do nothing
+            // For each item in reducedSiteDeckSymbols array, e.g. 'a' or 'aef'
+            // Comparing individual symbols from the current combinations array against the symbol in the criteria, 'a' <-> 'aef'
+            for (let index = 0; index < reducedSiteDeckSymbols.length; index++) {
+                if(reducedSiteDeckSymbols[index] == combinationsArray[combinationsArrayIndex][selectedCombinationIndex]) {
+                    // If there is a direct match, do nothing
+                    // TODO: why am I doing nothing here?
                 }
-                else if(reducedCardArray[index].includes(combinationsArray[combinationsArrayIndex][selectedCombinationIndex])) {
+                
+                else if(reducedSiteDeckSymbols[index].includes(combinationsArray[combinationsArrayIndex][selectedCombinationIndex])) {
                     // create a new copy of the combination set
                     let newMatchedSet = combinationsArray[combinationsArrayIndex].slice(0);
                     // replace the value with the matched value only if there are fewer symbols of that type than the limit defined above
-                    if(newMatchedSet.filter((letter) => letter == reducedCardArray[index]).length < expandedSymbolCountObject[reducedCardArray[index]]) {
+                    if(newMatchedSet.filter((letter) => letter == reducedSiteDeckSymbols[index]).length < decklistFrequencyMap[reducedSiteDeckSymbols[index]]) {
                         // Replace the item
-                        newMatchedSet[selectedCombinationIndex] = reducedCardArray[index];
+                        newMatchedSet[selectedCombinationIndex] = reducedSiteDeckSymbols[index];
                         newMatchedSet.sort();
                         // Check if the new set is unique
                         if(!combinationSignatureArray.includes(newMatchedSet.join(","))) {
@@ -89,5 +68,57 @@ export function generateCombinations(criteria, cardArray) {
     }
 
     return combinationsArray;
+}
+
+/**
+ * Creates a frequency map of symbols given a string array of values
+ * @param {Array<String>} inputArray
+ * @returns {Object}} 
+ */
+function createFrequencyMap(inputArray) {
+    const criteriaFrequencyMap = {};
+    for (let index = 0; index < inputArray.length; index++) {
+        if(!criteriaFrequencyMap.hasOwnProperty(inputArray[index]))
+        criteriaFrequencyMap[inputArray[index]] = inputArray.filter((letter) => letter == inputArray[index]).length
+    }
+    return criteriaFrequencyMap;
+}
+
+
+
+/**
+ * Reduces siteDeckSymbols' frequencies down to the maximum supported by the criteria
+ * @param {Array<String>} criteria
+ * @param {Array<String>} siteDeckSymbols
+ * @returns {Array<String>} 
+ */
+function reduceSiteDeckSymbols(criteria, criteriaFrequencyMap, siteDeckSymbols) {
+    // For each symbol type (a,e,f,w) reduce the frequency of that symbol down to the maximum number of symbols it matches with in the criteria array
+    // Example 1: 'a' array = [a,a,a,a,a] but criteria is [a,e,e,w]. Reduce the 'a' array down to [a], as there is only one possible match against the criteria
+    // Example 2: 'ae' array = [ae, ae, ae, ae]. Reduce down to [ae, ae, ae]
+    // TODO: Why am I doing this again?
+    const reducedSiteDeckSymbols = [];
+    for (let index = 0; index < siteDeckSymbols.length; index++) {
+        // exact matches, e.g. basic sites with one threshold
+        if(criteriaFrequencyMap.hasOwnProperty(siteDeckSymbols[index])) {
+            if(reducedSiteDeckSymbols.filter((letter) => siteDeckSymbols[index] == letter).length < criteriaFrequencyMap[siteDeckSymbols[index]]) {
+                reducedSiteDeckSymbols.push(siteDeckSymbols[index]);
+            }
+        } 
+        // multi-colored sites and others
+        else {
+            let includeCount = 0;
+            for (let j = 0; j < criteria.length; j++) {
+                if(siteDeckSymbols[index].includes(criteria[j])) {
+                    includeCount++;
+                }
+            }
+            if(includeCount > 0 && reducedSiteDeckSymbols.filter((letter) => letter == siteDeckSymbols[index]).length < includeCount) {
+                reducedSiteDeckSymbols.push(siteDeckSymbols[index]);
+            }
+        }
+    }
+    reducedSiteDeckSymbols.sort();
+    return reducedSiteDeckSymbols;
 }
 

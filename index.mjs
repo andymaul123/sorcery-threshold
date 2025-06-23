@@ -112,7 +112,7 @@ function init(criteria) {
         odds = simulateProbability(siteDeckSymbols, possibleSuccessCombinations, flags.iterations, flags.drawCount);
     }
     else {
-        odds = deriveProbability(siteDeckSymbols, possibleSuccessCombinations);
+        odds = deriveProbability(siteDeckSymbols, possibleSuccessCombinations, flags.drawCount);
     }
 
     console.log(`Odds of getting ${criteria} in a draw of ${flags.drawCount ? flags.drawCount : criteria.length} is ${odds}`);

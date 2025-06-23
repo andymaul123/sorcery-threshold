@@ -24,7 +24,7 @@ Feel free to alter the list.txt that is included as a template.
 
 `npm install`
 
-`node index.js`
+`node index.mjs`
 
 This will run the 'base' version of the tool using the dataset of Beta and Arthurian Legends sets provided by the Sorcery API.
 

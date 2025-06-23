@@ -100,7 +100,7 @@ export function simulateProbability(siteDeckSymbols, successCombinations, iterat
         }
 
         // If the drawCount is the same size as the criteria array
-        // i.e. "odds of getting criteria on turn ${criteria.length}"
+        // i.e. "odds of getting a,e,e,w on turn 4"
         // matching is easier. We use string comparisons instead of equality checks on arrays
         if(isStandardDrawCount) {
             const joinedPickedArray = pickedCards.sort().join(",");
