@@ -1,9 +1,9 @@
 {
   "name": "sorcery-threshold",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test" : "NODE_OPTIONS='--experimental-vm-modules' npx jest --silent"
   },
   "author": "Andrew Maul",
   "license": "ISC",
@@ -12,5 +12,13 @@
     "@inquirer/prompts": "^7.4.0",
     "chalk": "^5.4.1",
     "request": "^2.88.2"
-  }
+  },
+  "devDependencies": {
+    "jest": "^30.0.2"
+  },
+  "jest": {
+    "verbose": true,
+    "transform": {}
+  },
+  "type": "module"
 }
