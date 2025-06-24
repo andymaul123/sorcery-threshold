@@ -1,8 +1,10 @@
+import { createFrequencyMap } from "./utils.mjs";
+
 /**
- * Generates all possible combinations that would satisfy a given criteria
+ * Given an array of values and a criteria, generates all possible combinations from the array that satisfy the criteria
  * @param {Array<String>} criteria
  * @param {Array<String>} siteDeckSymbols
- * @returns {Array<String>} 
+ * @returns {Array<Array<String>>} 
  */
 
 export function generateCombinations(criteria, siteDeckSymbols) {
@@ -69,21 +71,6 @@ export function generateCombinations(criteria, siteDeckSymbols) {
 
     return combinationsArray;
 }
-
-/**
- * Creates a frequency map of symbols given a string array of values
- * @param {Array<String>} inputArray
- * @returns {Object}} 
- */
-function createFrequencyMap(inputArray) {
-    const criteriaFrequencyMap = {};
-    for (let index = 0; index < inputArray.length; index++) {
-        if(!criteriaFrequencyMap.hasOwnProperty(inputArray[index]))
-        criteriaFrequencyMap[inputArray[index]] = inputArray.filter((letter) => letter == inputArray[index]).length
-    }
-    return criteriaFrequencyMap;
-}
-
 
 
 /**

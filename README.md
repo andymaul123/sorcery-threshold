@@ -4,7 +4,7 @@ CLI tool for determining odds of resources in the CCG Sorcery.
 ![Example output](example.png)
 
 ## Background
-[Sorcery: Contested Realm](https://sorcerytcg.com/) is a trading/collectibe card game. The game uses a deck of cards, called Sites, as resources. These resources have attributes correlating to the four alchemical elements: Air, Earth, Fire, and Water. Playable cards (Spells) require a certain 'threshold' of symbols present on sites.
+[Sorcery: Contested Realm](https://sorcerytcg.com/) is a trading/collectible card game. The game uses a deck of cards, called Sites, as resources. These resources have attributes correlating to the four alchemical elements: Air, Earth, Fire, and Water. Playable cards (Spells) require a certain 'threshold' of symbols present on sites.
 
 When constructing a 30-card Atlas deck for the game, I wanted to know the odds of having a particular configuration of symbols on turn four. This tool provides that information.
 

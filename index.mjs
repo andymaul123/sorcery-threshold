@@ -109,9 +109,11 @@ function init(criteria) {
 
     let odds;
     if(flags.simulate) {
+        console.log(`Simulating probability...`);
         odds = simulateProbability(siteDeckSymbols, possibleSuccessCombinations, flags.iterations, flags.drawCount);
     }
     else {
+        console.log(`Deriving probability...`);
         odds = deriveProbability(siteDeckSymbols, possibleSuccessCombinations, flags.drawCount);
     }
 

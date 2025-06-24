@@ -1,4 +1,12 @@
-// Taken from https://www.30secondsofcode.org/js/s/binomial-coefficient/
+import { createFrequencyMap } from "./utils.mjs";
+
+/**
+ * Calculates binomial coefficient; how many ways to choose k items from n items without repition or order
+ * Taken from https://www.30secondsofcode.org/js/s/binomial-coefficient/
+ * @param {number} n
+ * @param {number} k
+ * @returns {number} 
+ */
 function binomialCoefficient (n, k) {
   if (Number.isNaN(n) || Number.isNaN(k)) return NaN;
   if (k < 0 || k > n) return 0;
@@ -10,31 +18,28 @@ function binomialCoefficient (n, k) {
   for (let i = 2; i <= k; i++) res *= (n - i + 1) / i;
   return Math.round(res);
 };
-// Runs a MHD calculation for a given possible combination state
+
+
+/**
+ * Runs a MHD calculation for a given possible combination state
+ * @param {Array<String>} siteDeck
+ * @param {Array<String>} singlePossibleCombination
+ * @param {number} drawCount
+ * @returns {number} 
+ */
 function multivariateHypergeometricDistribution(siteDeck, singlePossibleCombination) {
   let numerator = 1;
   let cumulativeMatches = 0;
-  let mhdSetSymbols = {};
-  // For each item in a given singlePossibleCombination example,
-  // construct a 'mhdSetSymbols' object with keys equal to the card symbol and value equal to the number of cards
-  // of that type in this combination
-  // Examples: {'a': 1, 'e': 2, 'w': 1} or {'ae':1,'aef':1,'e':1,'w':1}
-  for (let index = 0; index < singlePossibleCombination.length; index++) {
-      if(!mhdSetSymbols.hasOwnProperty(singlePossibleCombination[index])) {
-        mhdSetSymbols[singlePossibleCombination[index]] = singlePossibleCombination.filter((letter) => letter == singlePossibleCombination[index]).length;
-      }
-  }
+  const combinationSymbolsFrequencyMap = createFrequencyMap(singlePossibleCombination);
 
-  // For each item in newly constructed mhdSetSymbols object,
-  // determine the number of cards in the site deck match that exact representation and call it 'exactMatches'
-  // This will be the top number in a binomial coefficient calculation
-  // desiredMatchCount is the corresponding number value in the mhdSetSymbols object
-  // Add the number of exactMatches to the running tally
-  // Then calculate the binomial coefficient and multiply it by the previous results (or 1, if it's the first)
-  for (const key in mhdSetSymbols) {
-    if (Object.prototype.hasOwnProperty.call(mhdSetSymbols, key)) {
+  // For each symbol in combinationSymbolsFrequencyMap, determine the number of cards in the site deck that are an exact match.
+  // This will be the top number in a binomial coefficient calculation.
+  // desiredMatchCount is the corresponding frequency of that symbol.
+  // Add the number of exactMatches to the running tally, then calculate the binomial coefficient and multiply it by the previous results (or 1, if it's the first)
+  for (const key in combinationSymbolsFrequencyMap) {
+    if (Object.prototype.hasOwnProperty.call(combinationSymbolsFrequencyMap, key)) {
       const exactMatches = siteDeck.filter((item) => item == key).length;
-      const desiredMatchCount = mhdSetSymbols[key];
+      const desiredMatchCount = combinationSymbolsFrequencyMap[key];
       cumulativeMatches += exactMatches;
       numerator = numerator * binomialCoefficient(exactMatches, desiredMatchCount);
     }
@@ -53,10 +58,14 @@ function multivariateHypergeometricDistribution(siteDeck, singlePossibleCombinat
   return result;
 }
 
+/**
+ * Runs a MHD calculation on every possible success combination to find that particular probability, and adds them up for a resulting cumulative probability
+ * @param {Array<String>} siteDeck
+ * @param {Array<Array<String>>} allPossibleCombinations
+ * @param {number} drawCount
+ * @returns {number} 
+ */
 export function deriveProbability(siteDeck, allPossibleCombinations, drawCount) {
-  // For every possible combination of successes, run a MHD calculation to determine 
-  // the odds of that specific success, and add it to the overall cumulative odds
-  console.log(`Deriving probability...`);
   let cumulativeOdds = 0;
   for (let index = 0; index < allPossibleCombinations.length; index++) {
       cumulativeOdds += multivariateHypergeometricDistribution(siteDeck, allPossibleCombinations[index]);
