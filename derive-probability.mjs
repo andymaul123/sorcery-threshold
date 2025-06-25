@@ -22,8 +22,8 @@ function binomialCoefficient (n, k) {
 
 /**
  * Runs a MHD calculation for a given possible combination state
- * @param {Array<String>} siteDeck
- * @param {Array<String>} singlePossibleCombination
+ * @param {Array<string>} siteDeck
+ * @param {Array<string>} singlePossibleCombination
  * @param {number} drawCount
  * @returns {number} 
  */
@@ -60,8 +60,8 @@ function multivariateHypergeometricDistribution(siteDeck, singlePossibleCombinat
 
 /**
  * Runs a MHD calculation on every possible success combination to find that particular probability, and adds them up for a resulting cumulative probability
- * @param {Array<String>} siteDeck
- * @param {Array<Array<String>>} allPossibleCombinations
+ * @param {Array<string>} siteDeck
+ * @param {Array<Array<string>>} allPossibleCombinations
  * @param {number} drawCount
  * @returns {number} 
  */

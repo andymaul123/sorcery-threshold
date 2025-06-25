@@ -2,9 +2,9 @@ import { createFrequencyMap } from "./utils.mjs";
 
 /**
  * Given an array of values and a criteria, generates all possible combinations from the array that satisfy the criteria
- * @param {Array<String>} criteria
- * @param {Array<String>} siteDeckSymbols
- * @returns {Array<Array<String>>} 
+ * @param {Array<string>} criteria
+ * @param {Array<string>} siteDeckSymbols
+ * @returns {Array<Array<string>>} 
  */
 
 export function generateCombinations(criteria, siteDeckSymbols) {
@@ -12,6 +12,8 @@ export function generateCombinations(criteria, siteDeckSymbols) {
     const criteriaFrequencyMap = createFrequencyMap(criteria);
     const reducedSiteDeckSymbols = reduceSiteDeckSymbols(criteria, criteriaFrequencyMap, siteDeckSymbols);
     const decklistFrequencyMap = createFrequencyMap(reducedSiteDeckSymbols);
+
+    console.log(reducedSiteDeckSymbols);
     
     let matchCount = 0;
     const combinationsArray = [];
@@ -33,6 +35,7 @@ export function generateCombinations(criteria, siteDeckSymbols) {
     let iterations = 0;
     // For each item in the combinationsArray, e.g. [ [a,e,e,w], [...], ... ]
     for (let combinationsArrayIndex = 0; combinationsArrayIndex < combinationsArray.length; combinationsArrayIndex++) {
+        console.log(`First(outer) loop at iteration ${iterations}, combinationArray item is ${combinationsArray[combinationsArrayIndex]}`);
         iterations++;
         if(iterations >= safetyValue) {
             console.log(`Possible combinations has exceeded the safety value, which prevents infinite looping. Please increase the safety value and run again.`);
@@ -40,20 +43,25 @@ export function generateCombinations(criteria, siteDeckSymbols) {
         }
         // For each value in a given combinationsArray item array, e.g. [a,e,e,w]
         for (let selectedCombinationIndex = 0; selectedCombinationIndex < combinationsArray[combinationsArrayIndex].length; selectedCombinationIndex++) {
+            console.log(`Second(inner) loop running, ${combinationsArray[combinationsArrayIndex][selectedCombinationIndex]}`);
             // we're now nested down to the individual letter, e.g. "a" or "e"
             // For each item in reducedSiteDeckSymbols array, e.g. 'a' or 'aef'
             // Comparing individual symbols from the current combinations array against the symbol in the criteria, 'a' <-> 'aef'
             for (let index = 0; index < reducedSiteDeckSymbols.length; index++) {
+                console.log(`Third(innermost) loop running, iterating over RSDS, current is ${reducedSiteDeckSymbols[index]}`);
                 if(reducedSiteDeckSymbols[index] == combinationsArray[combinationsArrayIndex][selectedCombinationIndex]) {
+                    console.log(`Direct match, skipping`);
                     // If there is a direct match, do nothing
                     // TODO: why am I doing nothing here?
                 }
                 
                 else if(reducedSiteDeckSymbols[index].includes(combinationsArray[combinationsArrayIndex][selectedCombinationIndex])) {
+                    console.log(`Indirect match via include`);
                     // create a new copy of the combination set
                     let newMatchedSet = combinationsArray[combinationsArrayIndex].slice(0);
+                    console.log(`newMatchedSet is ${newMatchedSet}`);
                     // replace the value with the matched value only if there are fewer symbols of that type than the limit defined above
-                    if(newMatchedSet.filter((letter) => letter == reducedSiteDeckSymbols[index]).length < decklistFrequencyMap[reducedSiteDeckSymbols[index]]) {
+                    if(checkSymbolAmounts(newMatchedSet, reducedSiteDeckSymbols[index], decklistFrequencyMap[reducedSiteDeckSymbols[index]])) {
                         // Replace the item
                         newMatchedSet[selectedCombinationIndex] = reducedSiteDeckSymbols[index];
                         newMatchedSet.sort();
@@ -68,16 +76,16 @@ export function generateCombinations(criteria, siteDeckSymbols) {
             }
         }
     }
-
+    console.log(combinationsArray);
     return combinationsArray;
 }
 
 
 /**
  * Reduces siteDeckSymbols' frequencies down to the maximum supported by the criteria
- * @param {Array<String>} criteria
- * @param {Array<String>} siteDeckSymbols
- * @returns {Array<String>} 
+ * @param {Array<string>} criteria
+ * @param {Array<string>} siteDeckSymbols
+ * @returns {Array<string>} 
  */
 function reduceSiteDeckSymbols(criteria, criteriaFrequencyMap, siteDeckSymbols) {
     // For each symbol type (a,e,f,w) reduce the frequency of that symbol down to the maximum number of symbols it matches with in the criteria array
@@ -107,5 +115,20 @@ function reduceSiteDeckSymbols(criteria, criteriaFrequencyMap, siteDeckSymbols) 
     }
     reducedSiteDeckSymbols.sort();
     return reducedSiteDeckSymbols;
+}
+
+/**
+ * Checks a possible match set's symbols to ensure they are below the ceiling defined in the decklistFrequecyMap
+ * @param {Array<string>} possibleMatchSet
+ * @param {string} currentSymbolToCheckAgainst
+ * @param {number} symbolFrequenyLimit
+ * @returns {boolean} 
+ */
+function checkSymbolAmounts(possibleMatchSet, currentSymbolToCheckAgainst, symbolFrequencyLimit) {
+    const filteredSet = possibleMatchSet.filter((symbol) => {symbol == currentSymbolToCheckAgainst});
+    if(filteredSet.length < symbolFrequencyLimit) {
+        return true;
+    }
+    return false;
 }
 

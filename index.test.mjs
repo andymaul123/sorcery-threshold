@@ -30,6 +30,22 @@ describe('Basic control tests for the math behind deriveProbability', () => {
   });
 });
 
+describe('Basic control tests for simulating probability', () => {
+  test('Probablity of selecting a from a pool of a,e,f,w', () => {
+    const simulatedOutcome = simulateProbability(['a', 'e', 'f', 'w'], generateCombinations(['a'], ['a', 'e', 'f', 'w']), 1000, 1);
+    expect(simulatedOutcome).toBeGreaterThanOrEqual(23);
+    expect(simulatedOutcome).toBeLessThan(28);
+  });
+
+  test('Probablity of selecting a from a pool of aew,aew,aew', () => {
+    expect(simulateProbability(['aew', 'aew', 'aew'], generateCombinations(['a'], ['aew', 'aew', 'aew']), 1000, 1)).toBe(100);
+  });
+
+  test('Probability of selecting x from a pool of a,e,f,w', () => {
+    expect(simulateProbability(['a', 'e', 'f', 'w'], generateCombinations(['x'], ['a', 'e', 'f', 'w']), 1000, 1)).toBe(0);
+  });
+});
+
 describe('Tests using the original data set', () => {
   test('default derive probability test', () => {
     const probabilityOutcome = deriveProbability(siteDeckSymbols, generateCombinations(criteria, siteDeckSymbols));

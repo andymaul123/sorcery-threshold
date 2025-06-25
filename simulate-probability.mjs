@@ -1,12 +1,13 @@
 /**
  * Runs a Monte Carlo simulation choosing random 'cards' from the provided site deck
- * @param {Array<String>} siteDeck
- * @param {Array<Array<String>>} successCombinations
+ * @param {Array<string>} siteDeck
+ * @param {Array<Array<string>>} successCombinations
  * @param {number} [iterations]
  * @param {number} [drawCount]
  * @returns {number} 
  */
 export function simulateProbability(siteDeck, successCombinations, iterations = 1000, drawCount = 4) {
+    
     let successCounter = 0;
     const joinedSuccessArray = [];
     const isStandardDrawCount = drawCount === successCombinations[0].length;
@@ -56,8 +57,8 @@ export function simulateProbability(siteDeck, successCombinations, iterations = 
  * Determines if a chosen set satisfies criteria of any items the successCombinations array.
  * Example [a, ae, e, w] meets the criteria [a, e, e, w] despite not having identical symbols.
  * Prioritizes exact matches, then dual types, and so on
- * @param {Array<String>} randomSelection
- * @param {Array<Array<String>>} successCombinations
+ * @param {Array<string>} randomSelection
+ * @param {Array<Array<string>>} successCombinations
  * @returns {boolean} 
  */
 function isCriteriaMet(randomSelection, successCombinations) {
