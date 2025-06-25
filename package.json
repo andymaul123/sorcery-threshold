@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.mjs",
   "scripts": {
-    "test" : "NODE_OPTIONS='--experimental-vm-modules' npx jest"
+    "test" : "NODE_OPTIONS='--experimental-vm-modules' npx jest --silent"
   },
   "author": "Andrew Maul",
   "license": "ISC",

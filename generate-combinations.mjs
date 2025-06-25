@@ -4,21 +4,32 @@ import { createFrequencyMap } from "./utils.mjs";
  * Given an array of values and a criteria, generates all possible combinations from the array that satisfy the criteria
  * @param {Array<string>} criteria
  * @param {Array<string>} siteDeckSymbols
+ * @param {number} drawCount
  * @returns {Array<Array<string>>} 
  */
 
-export function generateCombinations(criteria, siteDeckSymbols) {
+export function generateCombinations(criteria, siteDeckSymbols, drawCount = 0) {
+    const MATCH_ANY = 'z';
+    // If the criteria array length is less than the drawCount, fill the criteria array with MATCH_ANY symbols until the length is equal
+    if(criteria.length < drawCount) {
+        const extraCriteria = drawCount - criteria.length;
+        for (let index = 0; index < extraCriteria; index++) {
+            criteria.push(MATCH_ANY);
+        }
+    }
+
+    console.log(`criteria is ${criteria}`);
 
     const criteriaFrequencyMap = createFrequencyMap(criteria);
     const reducedSiteDeckSymbols = reduceSiteDeckSymbols(criteria, criteriaFrequencyMap, siteDeckSymbols);
     const decklistFrequencyMap = createFrequencyMap(reducedSiteDeckSymbols);
-
-    console.log(reducedSiteDeckSymbols);
     
     let matchCount = 0;
     const combinationsArray = [];
     const combinationSignatureArray = [];
     const safetyValue = 300;
+
+
 
     // Seed the first combinations array with the criteria
     combinationsArray.push(criteria);
@@ -35,7 +46,6 @@ export function generateCombinations(criteria, siteDeckSymbols) {
     let iterations = 0;
     // For each item in the combinationsArray, e.g. [ [a,e,e,w], [...], ... ]
     for (let combinationsArrayIndex = 0; combinationsArrayIndex < combinationsArray.length; combinationsArrayIndex++) {
-        console.log(`First(outer) loop at iteration ${iterations}, combinationArray item is ${combinationsArray[combinationsArrayIndex]}`);
         iterations++;
         if(iterations >= safetyValue) {
             console.log(`Possible combinations has exceeded the safety value, which prevents infinite looping. Please increase the safety value and run again.`);
@@ -43,23 +53,18 @@ export function generateCombinations(criteria, siteDeckSymbols) {
         }
         // For each value in a given combinationsArray item array, e.g. [a,e,e,w]
         for (let selectedCombinationIndex = 0; selectedCombinationIndex < combinationsArray[combinationsArrayIndex].length; selectedCombinationIndex++) {
-            console.log(`Second(inner) loop running, ${combinationsArray[combinationsArrayIndex][selectedCombinationIndex]}`);
             // we're now nested down to the individual letter, e.g. "a" or "e"
             // For each item in reducedSiteDeckSymbols array, e.g. 'a' or 'aef'
             // Comparing individual symbols from the current combinations array against the symbol in the criteria, 'a' <-> 'aef'
             for (let index = 0; index < reducedSiteDeckSymbols.length; index++) {
-                console.log(`Third(innermost) loop running, iterating over RSDS, current is ${reducedSiteDeckSymbols[index]}`);
                 if(reducedSiteDeckSymbols[index] == combinationsArray[combinationsArrayIndex][selectedCombinationIndex]) {
-                    console.log(`Direct match, skipping`);
-                    // If there is a direct match, do nothing
-                    // TODO: why am I doing nothing here?
+                    // If there is a direct match, do nothing; we already have this combination set
                 }
                 
-                else if(reducedSiteDeckSymbols[index].includes(combinationsArray[combinationsArrayIndex][selectedCombinationIndex])) {
-                    console.log(`Indirect match via include`);
+                else if(reducedSiteDeckSymbols[index].includes(combinationsArray[combinationsArrayIndex][selectedCombinationIndex]) || combinationsArray[combinationsArrayIndex][selectedCombinationIndex] == MATCH_ANY) {
                     // create a new copy of the combination set
                     let newMatchedSet = combinationsArray[combinationsArrayIndex].slice(0);
-                    console.log(`newMatchedSet is ${newMatchedSet}`);
+                    console.log(newMatchedSet);
                     // replace the value with the matched value only if there are fewer symbols of that type than the limit defined above
                     if(checkSymbolAmounts(newMatchedSet, reducedSiteDeckSymbols[index], decklistFrequencyMap[reducedSiteDeckSymbols[index]])) {
                         // Replace the item
@@ -76,7 +81,6 @@ export function generateCombinations(criteria, siteDeckSymbols) {
             }
         }
     }
-    console.log(combinationsArray);
     return combinationsArray;
 }
 

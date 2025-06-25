@@ -102,7 +102,7 @@ function init(criteria) {
       throw new console.error(`Threshold criteria is missing; this is likely a bug`);
     }
 
-    const possibleSuccessCombinations = generateCombinations(criteria, siteDeckSymbols);
+    const possibleSuccessCombinations = generateCombinations(criteria, siteDeckSymbols, flags.drawCount);
     
 
     // Step 4: Feed the possible success combinations into the probability equations

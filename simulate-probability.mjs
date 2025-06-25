@@ -7,10 +7,11 @@
  * @returns {number} 
  */
 export function simulateProbability(siteDeck, successCombinations, iterations = 1000, drawCount = 4) {
-    
+    const criteriaLength = successCombinations[0].length;    
     let successCounter = 0;
     const joinedSuccessArray = [];
-    const isStandardDrawCount = drawCount === successCombinations[0].length;
+    // Letting JS cast the string value of drawCount into a number for comparison
+    const isStandardDrawCount = drawCount == criteriaLength;
 
     // If the drawCount == criteria length, join items in the successcombinations array for easier comparison later
     if(isStandardDrawCount) {
@@ -45,7 +46,7 @@ export function simulateProbability(siteDeck, successCombinations, iterations = 
         // i.e. odds of getting criteria (4 symbols) in 7 draws
         else {
             pickedCards.sort();
-            if(isCriteriaMet(pickedCards, successCombinations)) {
+            if(isCriteriaMet(pickedCards, successCombinations, criteriaLength)) {
                 successCounter++;
             }
         }
@@ -61,7 +62,7 @@ export function simulateProbability(siteDeck, successCombinations, iterations = 
  * @param {Array<Array<string>>} successCombinations
  * @returns {boolean} 
  */
-function isCriteriaMet(randomSelection, successCombinations) {
+function isCriteriaMet(randomSelection, successCombinations, criteriaLength) {
     let base = [];
     let dual = [];
     let triple = [];
@@ -125,7 +126,7 @@ function isCriteriaMet(randomSelection, successCombinations) {
             }
         
         }
-        if(matchCount == 4) {
+        if(matchCount == criteriaLength) {
             return true;
         }
     }
