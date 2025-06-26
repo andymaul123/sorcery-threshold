@@ -3,21 +3,17 @@
  * @param {Array<string>} siteDeck
  * @param {Array<Array<string>>} successCombinations
  * @param {number} [iterations]
- * @param {number} [drawCount]
+ * @param {number} [draws]
  * @returns {number} 
  */
-export function simulateProbability(siteDeck, successCombinations, iterations = 1000, drawCount = 4) {
-    const criteriaLength = successCombinations[0].length;    
+export function simulateProbability(siteDeck, successCombinations, iterations = 1000, draws) {
+    const criteriaLength = successCombinations[0].length;
     let successCounter = 0;
     const joinedSuccessArray = [];
-    // Letting JS cast the string value of drawCount into a number for comparison
-    const isStandardDrawCount = drawCount == criteriaLength;
+    const drawCount = draws ? draws : criteriaLength;
 
-    // If the drawCount == criteria length, join items in the successcombinations array for easier comparison later
-    if(isStandardDrawCount) {
-        for (let index = 0; index < successCombinations.length; index++) {
-            joinedSuccessArray.push(successCombinations[index].join(","));
-        }
+    for (let index = 0; index < successCombinations.length; index++) {
+        joinedSuccessArray.push(successCombinations[index].join(","));
     }
 
     // Run the simulation based on the iterations provided
@@ -33,103 +29,11 @@ export function simulateProbability(siteDeck, successCombinations, iterations = 
             proxiedSiteDeck.splice(randomNumber, 1); 
         }
 
-        // If the drawCount is the same size as the criteria array
-        // i.e. "odds of getting a,e,e,w on turn 4"
-        // matching is easier. We use string comparisons instead of equality checks on arrays
-        if(isStandardDrawCount) {
-            const joinedPickedArray = pickedCards.sort().join(",");
-            if(joinedSuccessArray.includes(joinedPickedArray)) {
-                successCounter++;
-            }
-        } 
-        // Otherwise, use the isCriteriaMet function
-        // i.e. odds of getting criteria (4 symbols) in 7 draws
-        else {
-            pickedCards.sort();
-            if(isCriteriaMet(pickedCards, successCombinations, criteriaLength)) {
-                successCounter++;
-            }
+        // Comparing strings is easier, so make a 'signature' of the symbols
+        const joinedPickedArray = pickedCards.sort().join(",");
+        if(joinedSuccessArray.includes(joinedPickedArray)) {
+            successCounter++;
         }
     }
     return (successCounter / iterations) * 100;
-}
-
-/**
- * Determines if a chosen set satisfies criteria of any items the successCombinations array.
- * Example [a, ae, e, w] meets the criteria [a, e, e, w] despite not having identical symbols.
- * Prioritizes exact matches, then dual types, and so on
- * @param {Array<string>} randomSelection
- * @param {Array<Array<string>>} successCombinations
- * @returns {boolean} 
- */
-function isCriteriaMet(randomSelection, successCombinations, criteriaLength) {
-    let base = [];
-    let dual = [];
-    let triple = [];
-    let quad = [];
-
-    // sort all symbols in the set into sub arrays based on length
-    for (let index = 0; index < randomSelection.length; index++) {
-        switch(randomSelection[index].length) {
-            case 1:
-                base.push(randomSelection[index]);
-                break;
-            case 2: 
-                dual.push(randomSelection[index]);
-                break;
-            case 3:
-                triple.push(randomSelection[index]);
-                break;
-            case 4: 
-                quad.push(randomSelection[index]);
-                break;
-            default:
-                console.log(`Error: somehow exceeded length of four characters`);
-        } 
-    }
-
-    // Iterate over every set in the success combinations array
-    // then iterate over each symbol in that set
-    // check for a match in length-priority, mutating arrays as we go to prevent 
-    // multi-matching. Return true if the criteria is met by the set
-    for (let i = 0; i < successCombinations.length; i++) {
-        let matchCount = 0;
-        for (let j = 0; j < successCombinations[i].length; j++) {
-            const baseMatchIndex = base.findIndex((value, index, array) => {
-                return value.includes(successCombinations[i][j]);
-            });
-            const dualMatchIndex = dual.findIndex((value, index, array) => {
-                return value.includes(successCombinations[i][j]);
-            });
-            const tripleMatchIndex = triple.findIndex((value, index, array) => {
-                return value.includes(successCombinations[i][j]);
-            });
-            const quadMatchIndex = quad.findIndex((value, index, array) => {
-                return value.includes(successCombinations[i][j]);
-            });
-
-            if(baseMatchIndex > -1) {
-                base.splice(baseMatchIndex, 1);
-                matchCount++
-            }
-            else if(dualMatchIndex > -1) {
-                dual.splice(dualMatchIndex, 1);
-                matchCount++
-            }
-            else if(tripleMatchIndex > -1) {
-                triple.splice(tripleMatchIndex, 1);
-                matchCount++
-            }
-            else if(quadMatchIndex > -1) {
-                quad.splice(quadMatchIndex, 1);
-                matchCount++
-            }
-        
-        }
-        if(matchCount == criteriaLength) {
-            return true;
-        }
-    }
-    // Otherwise return false
-    return false;
 }

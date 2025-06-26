@@ -103,21 +103,20 @@ function init(criteria) {
     }
 
     const possibleSuccessCombinations = generateCombinations(criteria, siteDeckSymbols, flags.drawCount);
-    
 
     // Step 4: Feed the possible success combinations into the probability equations
 
-    let odds;
+    let chance;
     if(flags.simulate) {
         console.log(`Simulating probability...`);
-        odds = simulateProbability(siteDeckSymbols, possibleSuccessCombinations, flags.iterations, flags.drawCount);
+        chance = simulateProbability(siteDeckSymbols, possibleSuccessCombinations, flags.iterations, flags.drawCount);
     }
     else {
         console.log(`Deriving probability...`);
-        odds = deriveProbability(siteDeckSymbols, possibleSuccessCombinations, flags.drawCount);
+        chance = deriveProbability(siteDeckSymbols, possibleSuccessCombinations, flags.drawCount);
     }
 
-    console.log(`Odds of getting ${criteria} in a draw of ${flags.drawCount ? flags.drawCount : criteria.length} is ${odds}`);
+    console.log(`Probability of getting ${criteria} in a draw of ${flags.drawCount ? flags.drawCount : criteria.length} is ${chance}`);
 
 }
 
