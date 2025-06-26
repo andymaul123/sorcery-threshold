@@ -57,7 +57,7 @@ describe('Tests using the original data set', () => {
     expect(simulatedOutcome).toBeLessThan(37);
   });
   test('default simulate probability test with draw 7', () => {
-    const simulatedOutcome = simulateProbability(siteDeckSymbols, generateCombinations(criteria, siteDeckSymbols), 1000, 7);
+    const simulatedOutcome = simulateProbability(siteDeckSymbols, generateCombinations(criteria, siteDeckSymbols, 7), 1000, 7);
     expect(simulatedOutcome).toBeGreaterThanOrEqual(85);
     expect(simulatedOutcome).toBeLessThan(91);
   });
