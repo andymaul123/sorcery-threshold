@@ -1,7 +1,7 @@
 /**
  * Creates a frequency map of symbols given a string array of values
  * @param {Array<String>} inputArray
- * @returns {Object}} 
+ * @returns {Object}
  */
 export function createFrequencyMap(inputArray) {
     const criteriaFrequencyMap = {};
@@ -11,4 +11,14 @@ export function createFrequencyMap(inputArray) {
         }
     }
     return criteriaFrequencyMap;
+}
+
+/**
+ * Clips a long decimal number to something more readable. Doesn't round the fractional value because I don't care.
+ * @param {number | string} value
+ * @returns {string}
+ */
+export function cleanTrailingFloatingPoint(value) {
+    const hasDecimal = String(value).indexOf('.');
+    return hasDecimal > -1 ? String(value).slice(0,hasDecimal+2) : String(value);
 }

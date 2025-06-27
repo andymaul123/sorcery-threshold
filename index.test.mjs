@@ -1,6 +1,7 @@
 import { generateCombinations } from "./generate-combinations.mjs";
 import { deriveProbability } from "./derive-probability.mjs";
 import { simulateProbability } from "./simulate-probability.mjs";
+import { cleanTrailingFloatingPoint } from "./utils.mjs";
 
 const criteria = ['a', 'e', 'e', 'w'];
 
@@ -28,6 +29,10 @@ describe('Basic control tests for the math behind deriveProbability', () => {
   test('Probability of selecting x from a pool of a,e,f,w', () => {
     expect(deriveProbability(['a', 'e', 'f', 'w'], generateCombinations(['x'], ['a', 'e', 'f', 'w']))).toBe(0);
   });
+
+  test('Probability of selecting a,e from a pool of a,e,af,w', () => {
+    expect(deriveProbability(['a', 'e', 'af', 'w'], generateCombinations(['a','e'], ['a', 'e', 'af', 'w']))).toBe(33.33333333333333);
+  });
 });
 
 describe('Basic control tests for simulating probability', () => {
@@ -43,6 +48,12 @@ describe('Basic control tests for simulating probability', () => {
 
   test('Probability of selecting x from a pool of a,e,f,w', () => {
     expect(simulateProbability(['a', 'e', 'f', 'w'], generateCombinations(['x'], ['a', 'e', 'f', 'w']), 1000, 1)).toBe(0);
+  });
+
+  test('Probability of selecting a,e from a pool of a,e,af,w', () => {
+    const simulatedOutcome = simulateProbability(['a', 'e', 'af', 'w'], generateCombinations(['a','e'], ['a', 'e', 'af', 'w']), 1000, 2);
+    expect(simulatedOutcome).toBeGreaterThanOrEqual(30);
+    expect(simulatedOutcome).toBeLessThan(37);
   });
 });
 
@@ -63,8 +74,13 @@ describe('Tests using the original data set', () => {
   });
 });
 
-
-
-
+describe('Unit tests for utils', () => {
+  test('cleanTrailingFloatingPoint correctly clips a long floating point value', () => {
+    expect(cleanTrailingFloatingPoint(33.33333333333333)).toBe('33.3');
+  });
+  test('cleanTrailingFloatingPoint correctly returns a number', () => {
+    expect(cleanTrailingFloatingPoint(33)).toBe('33');
+  });
+});
 
 

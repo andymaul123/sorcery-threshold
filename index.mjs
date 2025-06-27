@@ -12,6 +12,7 @@ import {
 import { generateCombinations } from './generate-combinations.mjs';
 import { deriveProbability } from "./derive-probability.mjs";
 import { simulateProbability } from "./simulate-probability.mjs";
+import { cleanTrailingFloatingPoint } from './utils.mjs';
 import { number } from '@inquirer/prompts';
 import chalk from 'chalk';
 
@@ -93,8 +94,8 @@ function init(criteria) {
     const siteDeck = getListOfSites();
     if(!siteDeck) {
         throw new console.error(`No list of sites provided. Please create a list.txt in the root directory. See README for more information.`);
-        
     }
+
     const siteDeckSymbols = convertDeckListToSymbols(siteDeck);
 
     // Step 3: Feed the deck list symbols into the combinator
@@ -105,18 +106,17 @@ function init(criteria) {
     const possibleSuccessCombinations = generateCombinations(criteria, siteDeckSymbols, flags.drawCount);
 
     // Step 4: Feed the possible success combinations into the probability equations
-
     let chance;
     if(flags.simulate) {
         console.log(`Simulating probability...`);
         chance = simulateProbability(siteDeckSymbols, possibleSuccessCombinations, flags.iterations, flags.drawCount);
     }
     else {
-        console.log(`Deriving probability...`);
+        console.log(`Calculating probability...`);
         chance = deriveProbability(siteDeckSymbols, possibleSuccessCombinations, flags.drawCount);
     }
 
-    console.log(`Probability of getting ${criteria} in a draw of ${flags.drawCount ? flags.drawCount : criteria.length} is ${chance}`);
+    console.log(`Probability of getting ${criteria} in a draw of ${flags.drawCount ? flags.drawCount : criteria.length} is ${cleanTrailingFloatingPoint(chance)}`);
 
 }
 
