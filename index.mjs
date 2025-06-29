@@ -116,7 +116,7 @@ function init(criteria) {
         chance = deriveProbability(siteDeckSymbols, possibleSuccessCombinations, flags.drawCount);
     }
 
-    console.log(`Probability of getting ${criteria} in a draw of ${flags.drawCount ? flags.drawCount : criteria.length} is ${cleanTrailingFloatingPoint(chance)}`);
+    console.log(`Probability of getting ${criteria} in a draw of ${flags.drawCount ? flags.drawCount : criteria.length} is ${cleanTrailingFloatingPoint(chance)}%`);
 
 }
 
