@@ -4,6 +4,7 @@ import { simulateProbability } from "./simulate-probability.mjs";
 import { cleanTrailingFloatingPoint } from "./utils.mjs";
 
 const criteria = ['a', 'e', 'e', 'w'];
+const joinedCriteria = ['a,e,f,w'];
 
 const siteDeckSymbols = [
   'a',   'a',  'a',  'a',  'a',
@@ -17,32 +18,58 @@ const siteDeckSymbols = [
 const originalDataProbability = 33.55592045247224;
 
 
+describe('Basic control tests for generating combinations', () => {
+  test('Generate combinations: 1 out of 4 match', () => {
+    expect(generateCombinations(['a'], ['a', 'e', 'f', 'w'], 1)).toStrictEqual([['a']]);
+  });
+  test('Generate combinations: 4 out of 4 match', () => {
+    expect(generateCombinations(['a'], ['a', 'ae', 'af', 'aw'], 1)).toStrictEqual([['a'],['ae'],['af'],['aw']]);
+  });
+  // TODO: This test fails because the generateCombinations erroneously returns [['a'],['a,e,f,w']]
+  // test('Generate combinations: 1 out of 1 match', () => {
+  //   expect(generateCombinations(['a'], ['a,e,f,w'], 1)).toStrictEqual([['a,e,f,w']]);
+  // });
+  // TODO: This test is untrue, as the criteria is never joined. Thus the app cannot give you probability in this scenario
+  test('Generate combinations: one Pristine Paradise, all 4 threshold', () => {
+    expect(generateCombinations(['a,e,f,w'], ['a,e,f,w'], 1)).toStrictEqual([['a,e,f,w']]);
+  });
+  test('Generate combinations: wild card, draw 2', () => {
+    expect(generateCombinations(['a'], ['a', 'e', 'f', 'w'], 2)).toStrictEqual([['a','e'],['a','f'],['a','w']]);
+  });
+});
+
+
 describe('Basic control tests for the math behind deriveProbability', () => {
-  test('Probablity of selecting a from a pool of a,e,f,w', () => {
+  test('Probability of selecting a from a pool of a,e,f,w', () => {
     expect(deriveProbability(['a', 'e', 'f', 'w'], generateCombinations(['a'], ['a', 'e', 'f', 'w']))).toBe(25);
   });
 
-  test('Probablity of selecting a from a pool of aew,aew,aew', () => {
+  test('Probability of selecting a from a pool of aew,aew,aew', () => {
     expect(deriveProbability(['aew', 'aew', 'aew'], generateCombinations(['a'], ['aew', 'aew', 'aew']))).toBe(100);
   });
 
   test('Probability of selecting x from a pool of a,e,f,w', () => {
     expect(deriveProbability(['a', 'e', 'f', 'w'], generateCombinations(['x'], ['a', 'e', 'f', 'w']))).toBe(0);
   });
-
   test('Probability of selecting a,e from a pool of a,e,af,w', () => {
     expect(deriveProbability(['a', 'e', 'af', 'w'], generateCombinations(['a','e'], ['a', 'e', 'af', 'w']))).toBe(33.33333333333333);
+  });
+  test('Probability of selecting a from a pool of a,e,f,w', () => {
+    expect(deriveProbability(['a', 'e', 'f', 'w'], generateCombinations(['a'], ['a', 'e', 'f', 'w'], 1))).toBe(25);
+  });
+  test('Probability of selecting a from a pool of a,e,f,w with drawCount 2', () => {
+    expect(deriveProbability(['a', 'e', 'f', 'w'], generateCombinations(['a'], ['a', 'e', 'f', 'w'], 2))).toBe(50);
   });
 });
 
 describe('Basic control tests for simulating probability', () => {
-  test('Probablity of selecting a from a pool of a,e,f,w', () => {
+  test('Probability of selecting a from a pool of a,e,f,w', () => {
     const simulatedOutcome = simulateProbability(['a', 'e', 'f', 'w'], generateCombinations(['a'], ['a', 'e', 'f', 'w']), 1000, 1);
     expect(simulatedOutcome).toBeGreaterThanOrEqual(23);
     expect(simulatedOutcome).toBeLessThan(28);
   });
 
-  test('Probablity of selecting a from a pool of aew,aew,aew', () => {
+  test('Probability of selecting a from a pool of aew,aew,aew', () => {
     expect(simulateProbability(['aew', 'aew', 'aew'], generateCombinations(['a'], ['aew', 'aew', 'aew']), 1000, 1)).toBe(100);
   });
 
@@ -54,6 +81,16 @@ describe('Basic control tests for simulating probability', () => {
     const simulatedOutcome = simulateProbability(['a', 'e', 'af', 'w'], generateCombinations(['a','e'], ['a', 'e', 'af', 'w']), 1000, 2);
     expect(simulatedOutcome).toBeGreaterThanOrEqual(30);
     expect(simulatedOutcome).toBeLessThan(37);
+  });
+  test('Probability of selecting a from a pool of a,e,f,w', () => {
+    const simulatedOutcome = simulateProbability(['a', 'e', 'f', 'w'], generateCombinations(['a'], ['a', 'e', 'f', 'w'], 1));
+    expect(simulatedOutcome).toBeGreaterThanOrEqual(22);
+    expect(simulatedOutcome).toBeLessThan(28);
+  });
+  test('Probability of selecting a from a pool of a,e,f,w with drawCount 2', () => {
+    const simulatedOutcome = simulateProbability(['a', 'e', 'f', 'w'], generateCombinations(['a'], ['a', 'e', 'f', 'w'], 2));
+    expect(simulatedOutcome).toBeGreaterThanOrEqual(46);
+    expect(simulatedOutcome).toBeLessThan(54);
   });
 });
 

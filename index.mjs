@@ -69,6 +69,9 @@ async function prompt() {
         }
       }
     }
+    // Testing out flattening the criteria array from the start
+    //criteriaArray = criteriaArray.join(',');
+    
     if(flags.save) {
       saveCriteria(criteriaArray.sort());
     }
