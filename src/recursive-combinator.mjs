@@ -33,17 +33,18 @@ function combinationValidator(possibleCombination, criteria) {
  * @param {number} totalCombinations
  * @param {number} iterations
  * @param {boolean} skipFiltering
- * @returns {Array<Array<string>>} 
+ * @param {any} promiseResolution
+ * @returns {Promise<Array<Array<string>>>} 
  */
-function recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, currentPointerArrayPosition, accumulatedCombinations, totalCombinations, iterations, skipFiltering) {
+async function recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, currentPointerArrayPosition, accumulatedCombinations, totalCombinations, iterations, skipFiltering, promiseResolution) {
 
     // The number of combinations from 30 cards with 7 samples. Used as the upper bound to prevent infinite loops.
     const maxSafety = 2035800;
     const safetyNumber = maxSafety < totalCombinations ? maxSafety + 1 : totalCombinations + 1;
 
     if(iterations >= safetyNumber) {
-        console.log(`Safety limit reached, early returning`);
-        return accumulatedCombinations;
+        console.log(`SAFETY LIMIT REACHED, ABORTING`);
+        return promiseResolution([]);
     }
 
     const possibleCombination = [];
@@ -103,11 +104,17 @@ function recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, curren
     }
 
     if(iterations == totalCombinations) {
-        return accumulatedCombinations;
+       promiseResolution(accumulatedCombinations);
+    }
+    // This bizarre piece of code is needed to prevent a stack overflow. Performing a setTimeout every 1000 iterations allows Node to clear its stack before continuing on.
+    // Unfortunately this problem means I had to convert this to an async function
+    else if(iterations % 1000 == 0) {
+        setTimeout(function() {
+            recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, currentPointerArrayPosition, accumulatedCombinations, totalCombinations, iterations+1, skipFiltering, promiseResolution);
+        }, 0);
     }
     else {
-        iterations++;
-        return recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, currentPointerArrayPosition, accumulatedCombinations, totalCombinations, iterations, skipFiltering)
+        recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, currentPointerArrayPosition, accumulatedCombinations, totalCombinations, iterations+1, skipFiltering, promiseResolution);
     }
 }
 
@@ -120,8 +127,12 @@ function recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, curren
  * @param {boolean} [skipFiltering]
  * @returns {Array<Array<string>>} 
  */
-export function generateCombinations(siteDeck, criteria, drawCount, skipFiltering=false) {
+export async function generateCombinations(siteDeck, criteria, drawCount, skipFiltering=false) {
     const pointerArray = createInitialPointerArray(drawCount);
     const totalCombinations = binomialCoefficient(siteDeck.length, drawCount);
-    return recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, drawCount-1, [], totalCombinations, 1, skipFiltering);
+    const accumulatedCombinations = [];
+    const combinations = await new Promise((resolve, reject) => {
+        return recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, drawCount-1, accumulatedCombinations, totalCombinations, 1, skipFiltering, resolve);
+    });
+    return combinations;
 }
