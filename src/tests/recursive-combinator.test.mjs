@@ -1,7 +1,17 @@
-import { generateCombinations } from '../recursive-combinator.mjs';
+import { generateCombinations, combinationValidator } from '../recursive-combinator.mjs';
 
 const siteDeckThirtyCards = ['a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e'];
 const siteDeckFourCards = ['a', 'e', 'f', 'w'];
+const siteDeckWildCards = ['aef', 'aew','aefw', 'x', 'y'];
+const battlemageSiteDeck = [
+  'a',   'a',  'a',  'a',  'a',
+  'a',   'ae', 'ae', 'ae', 'aef',
+  'aew', 'e',  'e',  'e',  'e',
+  'e',   'e',  'e',  'e',  'e',
+  'efw', 'ew', 'ew', 'ew', 'w',
+  'w',   'w',  'x',  'x',  'x'
+];
+const battlemageCriteria = ['a','e','e','w'];
 
 describe('Basic control tests for generating combinations with filtering', () => {
   test('Generate combinations: 1 out of 4 match', async () => {
@@ -23,6 +33,10 @@ describe('Basic control tests for generating combinations with filtering', () =>
   test('Generate combinations: 3 out of 6 match', async () => {
     const combinations = await generateCombinations(siteDeckFourCards, ['a'], 2, false);
     expect(combinations).toStrictEqual([['a','e'],['a','f'],['a','w']]);
+  });
+  test('Generate combinations: threshold is met with wildcards', async () => {
+    const combinations = await generateCombinations(siteDeckWildCards, ['a','e','e','w'], 3, false);
+    expect(combinations).toStrictEqual([['aef', 'aew', 'aefw'],['aef','aew', 'x'],['aef', 'aefw', 'x'],['aew', 'aefw', 'x']]);
   });
 });
 
@@ -64,3 +78,14 @@ describe('Basic control tests for generating combinations without filtering', ()
     expect(combinations.length).toStrictEqual(2035800);
   });
 });
+
+describe('Tests combination validator logic', () => {
+  test('Threshold is not met', () => {
+    expect(combinationValidator(['aefw','x','y'], battlemageCriteria)).toBe(false);
+  });
+  test('Criteria meets its own threshold', () => {
+    expect(combinationValidator(battlemageCriteria, battlemageCriteria)).toBe(true);
+  });
+});
+
+

@@ -54,3 +54,13 @@ export function cleanTrailingFloatingPoint(value) {
     const hasDecimal = String(value).indexOf('.');
     return hasDecimal > -1 ? String(value).slice(0,hasDecimal+2) : String(value);
 }
+
+/**
+ * Given a string and an indexed position, extract the position and return the other two halves glued back together
+ * @param {string} str
+ * @param {number} index
+ * @returns {string}
+ */
+export function extractStringSection(str, index) {
+    return str.substring(0, index) + str.substring(index+1);
+}
