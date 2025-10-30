@@ -24,8 +24,10 @@ export function binomialCoefficient (n, k) {
  */
 export function createInitialPointerArray(drawCount) {
     const pointerArray=[];
-    for (let index = 0; index < drawCount; index++) {
-        pointerArray.push(index);
+    if(drawCount && drawCount > 0) {
+        for (let index = 0; index < drawCount; index++) {
+            pointerArray.push(index);
+        }
     }
     return pointerArray;
 }

@@ -48,19 +48,16 @@ describe('Original Battlemage requirements', () => {
   // The probability is going down instead of up by roughly an equivalent amount
   test('Original criteria, mulligan 1 site', async () => {
     const combinations = await generateCombinations(battlemageSiteDeck, battlemageCriteria, 4, false);
-    console.log(combinations.length);
     const probability = deriveProbability(battlemageSiteDeck, combinations);
     expect(probability).toStrictEqual(64);
   });
   test('Original criteria, mulligan 2 sites', async () => {
     const combinations = await generateCombinations(battlemageSiteDeck, battlemageCriteria, 5, false);
-    console.log(combinations.length);
     const probability = deriveProbability(battlemageSiteDeck, combinations);
     expect(probability).toStrictEqual(64);
   });
   test('Original criteria, mulligan all 3 sites', async () => {
     const combinations = await generateCombinations(battlemageSiteDeck, battlemageCriteria, 6, false);
-    console.log(combinations.length);
     const probability = deriveProbability(battlemageSiteDeck, combinations);
     expect(probability).toStrictEqual(64);
   });

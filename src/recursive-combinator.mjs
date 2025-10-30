@@ -31,7 +31,51 @@ export function combinationValidator(possibleCombination, criteria) {
  * @returns {boolean} 
  */
 export function shouldResetPointers(pointerArray, currentPointerPosition, siteDeckTotal) {
-    return pointerArray.length >= 2 && pointerArray[currentPointerPosition] >= (siteDeckTotal - 1) - (Math.abs(currentPointerPosition - (pointerArray.length - 1)));
+    // If there's only a single value in the pointer array it never needs to be reset 
+    if(pointerArray.length <= 1) {
+        return false;
+    }
+    // The highest index in the array will be equal to the length of the array minus one
+    const upperBound = siteDeckTotal - 1;
+    
+    // The rightmost position in a horizontal array has a position delta of 0
+    // Each position to the left of it increases its delta by 1
+    const positionDelta = Math.abs(currentPointerPosition - (pointerArray.length - 1));
+    return pointerArray[currentPointerPosition] >= (upperBound - positionDelta);
+}
+
+/**
+ * Resets the pointer index
+ * @param {Array<number>} pointerArray
+ * @param {number} currentPointerPosition
+ * @returns {Array<number>} 
+ */
+export function resetPointers(pointerArray, currentPointerPosition) {
+    pointerArray[currentPointerPosition - 1] = pointerArray[currentPointerPosition - 1] + 1;
+
+    for (let index = currentPointerPosition; index < pointerArray.length; index++) {
+        pointerArray[index] = pointerArray[index-1] + 1;
+    }
+    return pointerArray;
+}
+
+/**
+ * Resets the pointer position
+ * @param {Array<number>} pointerArray
+ * @param {number} currentPointerPosition
+ * @param {number} siteDeckTotal
+ * @returns {number} 
+ */
+export function resetPointerPosition(pointerArray, currentPointerPosition, siteDeckTotal) {
+    const upperBound = siteDeckTotal - 1;
+    
+    if(pointerArray[currentPointerPosition] >= upperBound) {
+        currentPointerPosition--;
+    }
+    else {
+        currentPointerPosition = pointerArray.length - 1;
+    }
+    return currentPointerPosition;
 }
 
 /**
@@ -102,18 +146,10 @@ async function recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, 
      * Iterations are tracked and compared to the total combinations possible, ending the recursion.
      */
     if(shouldResetPointers(pointerArray, currentPointerArrayPosition, siteDeck.length)) {
-        console.log(`first if statement`);
-        pointerArray[currentPointerArrayPosition - 1] = pointerArray[currentPointerArrayPosition - 1] + 1;
-
-        for (let index = currentPointerArrayPosition; index < pointerArray.length; index++) {
-            pointerArray[index] = pointerArray[index-1] + 1;
-        }
-        if(currentPointerArrayPosition > 1) {
-            currentPointerArrayPosition--;
-        }
+        pointerArray = resetPointers(pointerArray, currentPointerArrayPosition);
+        currentPointerArrayPosition = resetPointerPosition(pointerArray, currentPointerArrayPosition, siteDeck.length);
     }
     else {
-        console.log(`else statement`);
         pointerArray[currentPointerArrayPosition] = pointerArray[currentPointerArrayPosition] + 1;
     }
 

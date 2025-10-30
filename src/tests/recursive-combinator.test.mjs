@@ -1,8 +1,9 @@
-import { generateCombinations, combinationValidator } from '../recursive-combinator.mjs';
+import { generateCombinations, combinationValidator, shouldResetPointers } from '../recursive-combinator.mjs';
 
 const siteDeckThirtyCards = ['a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e'];
 const siteDeckFourCards = ['a', 'e', 'f', 'w'];
 const siteDeckWildCards = ['aef', 'aew','aefw', 'x', 'y'];
+const siteDeckAlphabet = ['a', 'b','c', 'd', 'e'];
 const battlemageSiteDeck = [
   'a',   'a',  'a',  'a',  'a',
   'a',   'ae', 'ae', 'ae', 'aef',
@@ -34,13 +35,14 @@ describe('Basic control tests for generating combinations with filtering', () =>
     const combinations = await generateCombinations(siteDeckFourCards, ['a'], 2, false);
     expect(combinations).toStrictEqual([['a','e'],['a','f'],['a','w']]);
   });
+  //TODO: test is failing
   test('Generate combinations: threshold is met with wildcards', async () => {
     const combinations = await generateCombinations(siteDeckWildCards, ['a','e','e','w'], 3, false);
     expect(combinations).toStrictEqual([['aef', 'aew', 'aefw'],['aef','aew', 'x'],['aef', 'aefw', 'x'],['aew', 'aefw', 'x']]);
   });
 });
 
-describe('Basic control tests for generating combinations without filtering', () => {
+describe('Basic control tests for generating combinations without filtering - length', () => {
   test('Generate total possible combinations: 4 draw 1', async () => {
     const combinations = await generateCombinations(siteDeckFourCards, ['a'], 1, true);
     expect(combinations.length).toStrictEqual(4);
@@ -78,6 +80,14 @@ describe('Basic control tests for generating combinations without filtering', ()
     expect(combinations.length).toStrictEqual(2035800);
   });
 });
+// TODO: build up these test cases as bugs are fixed
+describe('Basic control tests for generating combinations without filtering - combination array', () => {
+  test('Generates correct combinations', async () => {
+    const combinations = await generateCombinations(siteDeckAlphabet, ['a'], 3, true);
+    expect(combinations.length).toBe(10);
+    expect(combinations).toStrictEqual([["a","b","c"],["a","b","d"],["a","b","e"],["a","c","d"],["a","c","e"],["a","d","e"],["b","c","d"],["b","c","e"],["b","d","e"],["c","d","e"]]);
+  });
+});
 
 describe('Tests combination validator logic', () => {
   test('Threshold is not met', () => {
@@ -86,6 +96,40 @@ describe('Tests combination validator logic', () => {
   test('Criteria meets its own threshold', () => {
     expect(combinationValidator(battlemageCriteria, battlemageCriteria)).toBe(true);
   });
+  test('Criteria is met with extras', () => {
+    expect(combinationValidator(['a', 'ef', 'ae', 'x', 'y', 'wf'], battlemageCriteria)).toBe(true);
+  });
 });
 
-
+describe('Tests pointer reset logic', () => {
+  test('Returns false', () => {
+    expect(shouldResetPointers([0,1,2], 2, 5)).toBe(false);
+  });
+  test('Returns false', () => {
+    expect(shouldResetPointers([0,1,3], 2, 5)).toBe(false);
+  });
+  test('Returns false', () => {
+    expect(shouldResetPointers([0,1,4], 2, 5)).toBe(true);
+  });
+  test('Returns false', () => {
+    expect(shouldResetPointers([0,2,3], 1, 5)).toBe(false);
+  });
+  test('Returns false', () => {
+    expect(shouldResetPointers([0,2,4], 1, 5)).toBe(false);
+  });
+  test('Returns true', () => {
+    expect(shouldResetPointers([0,3,4], 1, 5)).toBe(true);
+  });
+  test('Returns false', () => {
+    expect(shouldResetPointers([1,2,3], 2, 5)).toBe(false);
+  });
+  test('Returns true', () => {
+    expect(shouldResetPointers([1,2,4], 2, 5)).toBe(true);
+  });
+  test('Returns true', () => {
+    expect(shouldResetPointers([1,3,4], 1, 5)).toBe(true);
+  });
+  test('Returns true', () => {
+    expect(shouldResetPointers([2,3,4], 0, 5)).toBe(true);
+  });
+});
