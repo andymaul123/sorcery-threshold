@@ -54,7 +54,7 @@ export function createFrequencyMap(inputArray) {
  */
 export function cleanTrailingFloatingPoint(value) {
     const hasDecimal = String(value).indexOf('.');
-    return hasDecimal > -1 ? String(value).slice(0,hasDecimal+2) : String(value);
+    return hasDecimal > -1 ? String(value).slice(0,hasDecimal+2) : String(value + ".0");
 }
 
 /**

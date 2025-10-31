@@ -3,7 +3,6 @@ import { generateCombinations, combinationValidator, shouldResetPointers } from 
 const siteDeckThirtyCards = ['a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e'];
 const siteDeckFourCards = ['a', 'e', 'f', 'w'];
 const siteDeckWildCards = ['aef', 'aew','aefw', 'x', 'y'];
-const siteDeckAlphabet = ['a', 'b','c', 'd', 'e'];
 const battlemageSiteDeck = [
   'a',   'a',  'a',  'a',  'a',
   'a',   'ae', 'ae', 'ae', 'aef',
@@ -35,10 +34,17 @@ describe('Basic control tests for generating combinations with filtering', () =>
     const combinations = await generateCombinations(siteDeckFourCards, ['a'], 2, false);
     expect(combinations).toStrictEqual([['a','e'],['a','f'],['a','w']]);
   });
-  //TODO: test is failing
-  test('Generate combinations: threshold is met with wildcards', async () => {
+  test('Generate combinations: threshold is met with wildcards draw 1', async () => {
+    const combinations = await generateCombinations(siteDeckWildCards, ['a','e','e','w'], 1, false);
+    expect(combinations).toStrictEqual([]);
+  });
+  test('Generate combinations: threshold is met with wildcards draw 2', async () => {
+    const combinations = await generateCombinations(siteDeckWildCards, ['a','e','e','w'], 2, false);
+    expect(combinations).toStrictEqual([["aef","aew"],["aef","aefw"],["aew","aefw"]]);
+  });
+  test('Generate combinations: threshold is met with wildcards draw 3', async () => {
     const combinations = await generateCombinations(siteDeckWildCards, ['a','e','e','w'], 3, false);
-    expect(combinations).toStrictEqual([['aef', 'aew', 'aefw'],['aef','aew', 'x'],['aef', 'aefw', 'x'],['aew', 'aefw', 'x']]);
+    expect(combinations).toStrictEqual([["aef","aew","aefw"],["aef","aew","x"],["aef","aew","y"],["aef","aefw","x"],["aef","aefw","y"],["aew","aefw","x"],["aew","aefw","y"]]);
   });
 });
 
@@ -80,12 +86,35 @@ describe('Basic control tests for generating combinations without filtering - le
     expect(combinations.length).toStrictEqual(2035800);
   });
 });
-// TODO: build up these test cases as bugs are fixed
+
 describe('Basic control tests for generating combinations without filtering - combination array', () => {
-  test('Generates correct combinations', async () => {
-    const combinations = await generateCombinations(siteDeckAlphabet, ['a'], 3, true);
+  test('Generates correct combinations 6 draw 1', async () => {
+    const combinations = await generateCombinations(['a', 'b','c', 'd', 'e', 'f'], ['a'], 1, true);
+    expect(combinations.length).toBe(6);
+    expect(combinations).toStrictEqual([["a"],["b"],["c"],["d"],["e"],["f"],]);
+  });
+  test('Generates correct combinations 6 draw 2', async () => {
+    const combinations = await generateCombinations(['a', 'b','c', 'd', 'e', 'f'], ['a'], 2, true);
+    expect(combinations.length).toBe(15);
+    expect(combinations).toStrictEqual([["a","b"],["a","c"],["a","d"],["a","e"],["a","f"],["b","c"],["b","d"],["b","e"],["b","f"],["c","d"],["c","e"],["c","f"],["d","e"],["d","f"],["e","f"]]);
+  });
+  test('Generates correct combinations 6 draw 3', async () => {
+    const combinations = await generateCombinations(['a', 'b','c', 'd', 'e', 'f'], ['a'], 3, true);
+    expect(combinations.length).toBe(20);
+    expect(combinations).toStrictEqual([["a","b","c"],["a","b","d"],["a","b","e"],["a","b","f"],["a","c","d"],["a","c","e"],["a","c","f"],["a","d","e"],["a","d","f"],["a","e","f"],["b","c","d"],["b","c","e"],["b","c","f"],["b","d","e"],["b","d","f"],["b","e","f"],["c","d","e"],["c","d","f"],["c","e","f"],["d","e","f"]]);
+  });
+  test('Generates correct combinations 5 draw 3', async () => {
+    const combinations = await generateCombinations(['a', 'b','c', 'd', 'e'], ['a'], 3, true);
     expect(combinations.length).toBe(10);
     expect(combinations).toStrictEqual([["a","b","c"],["a","b","d"],["a","b","e"],["a","c","d"],["a","c","e"],["a","d","e"],["b","c","d"],["b","c","e"],["b","d","e"],["c","d","e"]]);
+  });
+});
+
+describe('Tests using the original data set', () => {
+  test('', async () => {
+    const combinations = await generateCombinations(battlemageSiteDeck, battlemageCriteria, 1, true);
+    expect(combinations.length).toBe(30);
+    expect(combinations).toStrictEqual([['a'],['a'],['a'],['a'],['a'],['a'],['ae'],['ae'],['ae'],['aef'],['aew'],['e'],['e'],['e'],['e'],['e'],['e'],['e'],['e'],['e'],['efw'],['ew'],['ew'],['ew'],['w'],['w'],['w'],['x'],['x'],['x']]);
   });
 });
 

@@ -14,14 +14,14 @@ const battlemageSiteDeck = [
 ];
 const battlemageCriteria = ['a','e','e','w'];
 
-const siteDeckWildCards = ['a', 'b','c', 'd', 'e'];
+const siteDeckWildCards = ['aef', 'aew','aefw', 'x', 'y'];
 
 //const combos = generateCombinations(battlemageCriteria, battlemageSiteDeck, 1);
-const combos = await generateCombinations(siteDeckWildCards, battlemageCriteria, 3, true);
+const combos = await generateCombinations(battlemageSiteDeck, battlemageCriteria, 3, false);
 
 //const validate = combinationValidator(["aefw","x","y"],battlemageCriteria);
 
-process.stdout.write(JSON.stringify(combos) + '\n');
+process.stdout.write(JSON.stringify(combos.length) + '\n');
 
 // old: 128
 // new: 68

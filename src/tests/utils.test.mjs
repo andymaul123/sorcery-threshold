@@ -46,8 +46,8 @@ describe('Tests for cleanTrailingFloatingPoint', () => {
   test('cleanTrailingFloatingPoint correctly clips a long floating point value', () => {
     expect(cleanTrailingFloatingPoint(33.33333333333333)).toBe('33.3');
   });
-  test('cleanTrailingFloatingPoint correctly returns a number', () => {
-    expect(cleanTrailingFloatingPoint(33)).toBe('33');
+  test('cleanTrailingFloatingPoint adds suffix on evenly rounded numbers', () => {
+    expect(cleanTrailingFloatingPoint(33)).toBe('33.0');
   });
 });
 

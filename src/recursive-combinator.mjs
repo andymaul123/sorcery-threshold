@@ -108,6 +108,9 @@ async function recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, 
     for (let index = 0; index < pointerArray.length; index++) {
         possibleCombination.push(siteDeck[pointerArray[index]]);
     }
+
+    // TODO: pre-emptively de-dupe the possible combinations array by flattening the array into a string and checking accumulatedCombination.some
+
     // Flag added for ease of testing
     if(skipFiltering) {
         accumulatedCombinations.push(possibleCombination);
