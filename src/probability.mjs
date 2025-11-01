@@ -8,9 +8,11 @@ import { binomialCoefficient, createFrequencyMap } from "./utils.mjs";
  * @returns {number} 
  */
 function multivariateHypergeometricDistribution(siteDeck, singlePossibleCombination) {
+  // Convert the string signature back into an array
+  const revivedCombination = singlePossibleCombination.split(',');
   let numerator = 1;
   let cumulativeMatches = 0;
-  const combinationSymbolsFrequencyMap = createFrequencyMap(singlePossibleCombination);
+  const combinationSymbolsFrequencyMap = createFrequencyMap(revivedCombination);
 
   // For each symbol in combinationSymbolsFrequencyMap, determine the number of cards in the site deck that are an exact match.
   // This will be the top number in a binomial coefficient calculation.
@@ -32,7 +34,7 @@ function multivariateHypergeometricDistribution(siteDeck, singlePossibleCombinat
   }
   // The denominator of the MHD calculation is a single binomial coefficient with the total site deck over the 'draw count', or number of symbols in the 
   // singlePossibleCombination array
-  const denominator = binomialCoefficient(siteDeck.length, singlePossibleCombination.length);
+  const denominator = binomialCoefficient(siteDeck.length, revivedCombination.length);
 
   const result = numerator / denominator;
   return result;

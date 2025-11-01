@@ -1,4 +1,4 @@
-import { cleanTrailingFloatingPoint, binomialCoefficient, createInitialPointerArray, createFrequencyMap, extractStringSection } from "../utils.mjs";
+import { cleanTrailingFloatingPoint, binomialCoefficient, createInitialPointerArray, createFrequencyMap, extractStringSection, combinationValidator } from "../utils.mjs";
 
 describe('Tests for binomialCoefficient', () => {
   test('binomialCoefficient returns 2 combinations from 2/1', () => {
@@ -60,5 +60,17 @@ describe('Tests for extractStringSection', () => {
   });
   test('extractStringSection correctly extracts "f" at the end of the string', () => {
     expect(extractStringSection('abcdef', 5)).toBe('abcde');
+  });
+});
+
+describe('Tests combination validator logic', () => {
+  test('Threshold is not met', () => {
+    expect(combinationValidator('aefw,x,y', battlemageCriteria)).toBe(false);
+  });
+  test('Criteria meets its own threshold', () => {
+    expect(combinationValidator('a,e,e,w', battlemageCriteria)).toBe(true);
+  });
+  test('Criteria is met with extras', () => {
+    expect(combinationValidator('a,ef,ae,x,y,wf', battlemageCriteria)).toBe(true);
   });
 });

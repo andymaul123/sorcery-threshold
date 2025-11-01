@@ -66,3 +66,26 @@ export function cleanTrailingFloatingPoint(value) {
 export function extractStringSection(str, index) {
     return str.substring(0, index) + str.substring(index+1);
 }
+
+/**
+ * Validates a possible combination by looping through each element in the criteria and 
+ * doing a string search for that character. If found, the character is removed and the loop continues.
+ * If one is not found, it early returns.
+ * @param {Array<string>} possibleCombination
+ * @param {Array<string>} criteria
+ * @returns {boolean} 
+ */
+export function combinationValidator(possibleCombination, criteria) {
+    let copiedCombination = possibleCombination;
+    for (let index = 0; index < criteria.length; index++) {
+        const indexedPosition = copiedCombination.indexOf(criteria[index]);
+        if(indexedPosition > -1) {
+            const mutatedString = extractStringSection(copiedCombination, indexedPosition);
+            copiedCombination = mutatedString;
+        } 
+        else {
+            return false;
+        }
+    }
+    return true;
+}

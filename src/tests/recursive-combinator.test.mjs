@@ -1,4 +1,4 @@
-import { generateCombinations, combinationValidator, shouldResetPointers } from '../recursive-combinator.mjs';
+import { generateCombinations, shouldResetPointers } from '../recursive-combinator.mjs';
 
 const siteDeckThirtyCards = ['a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e'];
 const siteDeckFourCards = ['a', 'e', 'f', 'w'];
@@ -16,23 +16,23 @@ const battlemageCriteria = ['a','e','e','w'];
 describe('Basic control tests for generating combinations with filtering', () => {
   test('Generate combinations: 1 out of 4 match', async () => {
     const combinations = await generateCombinations(siteDeckFourCards, ['a'], 1, false);
-    expect(combinations).toStrictEqual([['a']]);
+    expect(combinations).toStrictEqual(['a']);
   });
   test('Generate combinations: 4 out of 4 match', async () => {
     const combinations = await generateCombinations(['a', 'ae', 'af', 'aw'], ['a'], 1, false);
-    expect(combinations).toStrictEqual([['a'],['ae'],['af'],['aw']]);
+    expect(combinations).toStrictEqual(['a','ae','af','aw']);
   });
   test('Generate combinations: 1 out of 1 match', async () => {
     const combinations = await generateCombinations(['aefw'], ['a'], 1, false);
-    expect(combinations).toStrictEqual([['aefw']]);
+    expect(combinations).toStrictEqual(['aefw']);
   });
   test('Generate combinations: one Pristine Paradise, all 4 threshold', async () => {
     const combinations = await generateCombinations(['aefw'], ['a','e','f','w'], 1); 
-    expect(combinations).toStrictEqual([['aefw']]);
+    expect(combinations).toStrictEqual(['aefw']);
   });
   test('Generate combinations: 3 out of 6 match', async () => {
     const combinations = await generateCombinations(siteDeckFourCards, ['a'], 2, false);
-    expect(combinations).toStrictEqual([['a','e'],['a','f'],['a','w']]);
+    expect(combinations).toStrictEqual(['a,e','a,f','a,w']);
   });
   test('Generate combinations: threshold is met with wildcards draw 1', async () => {
     const combinations = await generateCombinations(siteDeckWildCards, ['a','e','e','w'], 1, false);
@@ -40,11 +40,11 @@ describe('Basic control tests for generating combinations with filtering', () =>
   });
   test('Generate combinations: threshold is met with wildcards draw 2', async () => {
     const combinations = await generateCombinations(siteDeckWildCards, ['a','e','e','w'], 2, false);
-    expect(combinations).toStrictEqual([["aef","aew"],["aef","aefw"],["aew","aefw"]]);
+    expect(combinations).toStrictEqual(["aef,aew","aef,aefw","aew,aefw"]);
   });
   test('Generate combinations: threshold is met with wildcards draw 3', async () => {
     const combinations = await generateCombinations(siteDeckWildCards, ['a','e','e','w'], 3, false);
-    expect(combinations).toStrictEqual([["aef","aew","aefw"],["aef","aew","x"],["aef","aew","y"],["aef","aefw","x"],["aef","aefw","y"],["aew","aefw","x"],["aew","aefw","y"]]);
+    expect(combinations).toStrictEqual(["aef,aew,aefw","aef,aew,x","aef,aew,y","aef,aefw,x","aef,aefw,y","aew,aefw,x","aew,aefw,y"]);
   });
 });
 
@@ -91,22 +91,22 @@ describe('Basic control tests for generating combinations without filtering - co
   test('Generates correct combinations 6 draw 1', async () => {
     const combinations = await generateCombinations(['a', 'b','c', 'd', 'e', 'f'], ['a'], 1, true);
     expect(combinations.length).toBe(6);
-    expect(combinations).toStrictEqual([["a"],["b"],["c"],["d"],["e"],["f"],]);
+    expect(combinations).toStrictEqual(["a","b","c","d","e","f",]);
   });
   test('Generates correct combinations 6 draw 2', async () => {
     const combinations = await generateCombinations(['a', 'b','c', 'd', 'e', 'f'], ['a'], 2, true);
     expect(combinations.length).toBe(15);
-    expect(combinations).toStrictEqual([["a","b"],["a","c"],["a","d"],["a","e"],["a","f"],["b","c"],["b","d"],["b","e"],["b","f"],["c","d"],["c","e"],["c","f"],["d","e"],["d","f"],["e","f"]]);
+    expect(combinations).toStrictEqual(["a,b","a,c","a,d","a,e","a,f","b,c","b,d","b,e","b,f","c,d","c,e","c,f","d,e","d,f","e,f"]);
   });
   test('Generates correct combinations 6 draw 3', async () => {
     const combinations = await generateCombinations(['a', 'b','c', 'd', 'e', 'f'], ['a'], 3, true);
     expect(combinations.length).toBe(20);
-    expect(combinations).toStrictEqual([["a","b","c"],["a","b","d"],["a","b","e"],["a","b","f"],["a","c","d"],["a","c","e"],["a","c","f"],["a","d","e"],["a","d","f"],["a","e","f"],["b","c","d"],["b","c","e"],["b","c","f"],["b","d","e"],["b","d","f"],["b","e","f"],["c","d","e"],["c","d","f"],["c","e","f"],["d","e","f"]]);
+    expect(combinations).toStrictEqual(["a,b,c","a,b,d","a,b,e","a,b,f","a,c,d","a,c,e","a,c,f","a,d,e","a,d,f","a,e,f","b,c,d","b,c,e","b,c,f","b,d,e","b,d,f","b,e,f","c,d,e","c,d,f","c,e,f","d,e,f"]);
   });
   test('Generates correct combinations 5 draw 3', async () => {
     const combinations = await generateCombinations(['a', 'b','c', 'd', 'e'], ['a'], 3, true);
     expect(combinations.length).toBe(10);
-    expect(combinations).toStrictEqual([["a","b","c"],["a","b","d"],["a","b","e"],["a","c","d"],["a","c","e"],["a","d","e"],["b","c","d"],["b","c","e"],["b","d","e"],["c","d","e"]]);
+    expect(combinations).toStrictEqual(["a,b,c","a,b,d","a,b,e","a,c,d","a,c,e","a,d,e","b,c,d","b,c,e","b,d,e","c,d,e"]);
   });
 });
 
@@ -114,19 +114,7 @@ describe('Tests using the original data set', () => {
   test('', async () => {
     const combinations = await generateCombinations(battlemageSiteDeck, battlemageCriteria, 1, true);
     expect(combinations.length).toBe(30);
-    expect(combinations).toStrictEqual([['a'],['a'],['a'],['a'],['a'],['a'],['ae'],['ae'],['ae'],['aef'],['aew'],['e'],['e'],['e'],['e'],['e'],['e'],['e'],['e'],['e'],['efw'],['ew'],['ew'],['ew'],['w'],['w'],['w'],['x'],['x'],['x']]);
-  });
-});
-
-describe('Tests combination validator logic', () => {
-  test('Threshold is not met', () => {
-    expect(combinationValidator(['aefw','x','y'], battlemageCriteria)).toBe(false);
-  });
-  test('Criteria meets its own threshold', () => {
-    expect(combinationValidator(battlemageCriteria, battlemageCriteria)).toBe(true);
-  });
-  test('Criteria is met with extras', () => {
-    expect(combinationValidator(['a', 'ef', 'ae', 'x', 'y', 'wf'], battlemageCriteria)).toBe(true);
+    expect(combinations).toStrictEqual(['a','a','a','a','a','a','ae','ae','ae','aef','aew','e','e','e','e','e','e','e','e','e','efw','ew','ew','ew','w','w','w','x','x','x']);
   });
 });
 

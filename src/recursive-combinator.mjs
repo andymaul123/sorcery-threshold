@@ -1,27 +1,4 @@
-import { binomialCoefficient, createInitialPointerArray, extractStringSection } from "./utils.mjs";
-
-/**
- * Validates a possible combination by looping through each element in the criteria and 
- * doing a string search for that character. If found, the character is removed and the loop continues.
- * If one is not found, it early returns.
- * @param {Array<string>} possibleCombination
- * @param {Array<string>} criteria
- * @returns {boolean} 
- */
-export function combinationValidator(possibleCombination, criteria) {
-    let comboSignature = possibleCombination.join('');
-    for (let index = 0; index < criteria.length; index++) {
-        const indexedPosition = comboSignature.indexOf(criteria[index]);
-        if(indexedPosition > -1) {
-            const mutatedString = extractStringSection(comboSignature, indexedPosition);
-            comboSignature = mutatedString;
-        } 
-        else {
-            return false;
-        }
-    }
-    return true;
-}
+import { binomialCoefficient, createInitialPointerArray, extractStringSection, combinationValidator } from "./utils.mjs";
 
 /**
  * Determines whether the position in the 'pointer array' is at its end, and the array positions should be reset
@@ -85,7 +62,7 @@ export function resetPointerPosition(pointerArray, currentPointerPosition, siteD
  * @param {Array<string>} criteria
  * @param {Array<number>} pointerArray
  * @param {number} currentPointerArrayPosition
- * @param {Array<Array<string>>} accumulatedCombinations
+ * @param {Array<string>} accumulatedCombinations
  * @param {number} totalCombinations
  * @param {number} iterations
  * @param {boolean} skipFiltering
@@ -103,19 +80,22 @@ async function recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, 
         return promiseResolution([]);
     }
 
-    const possibleCombination = [];
+    let possibleCombination = [];
     // Create a possible combination from the site deck using the pointerArray indexes to select N cards
     for (let index = 0; index < pointerArray.length; index++) {
         possibleCombination.push(siteDeck[pointerArray[index]]);
     }
+    possibleCombination = possibleCombination.join(',');
 
-    // TODO: pre-emptively de-dupe the possible combinations array by flattening the array into a string and checking accumulatedCombination.some
+    // TODO: preemptively de-dupe the possible combinations array by flattening the array into a string and checking accumulatedCombination.some
+
+
 
     // Flag added for ease of testing
     if(skipFiltering) {
         accumulatedCombinations.push(possibleCombination);
     }
-    else if(combinationValidator(possibleCombination, criteria)) {
+    else if(combinationValidator(possibleCombination, criteria) && !accumulatedCombinations.includes(possibleCombination)) {
         accumulatedCombinations.push(possibleCombination);
     }
     /**
@@ -178,7 +158,7 @@ async function recursiveCombinator(drawCount, siteDeck, criteria, pointerArray, 
  * @param {Array<string>} criteria
  * @param {number} drawCount
  * @param {boolean} [skipFiltering]
- * @returns {Array<Array<string>>} 
+ * @returns {Array<string>} 
  */
 export async function generateCombinations(siteDeck, criteria, drawCount, skipFiltering=false) {
     const pointerArray = createInitialPointerArray(drawCount);

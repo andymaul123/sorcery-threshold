@@ -52,19 +52,40 @@ describe('Probability with wildcard combinations', () => {
 });
 
 describe('Original Battlemage requirements', () => {
-  // The probability math was done by hand & calculator to corroborate
   test('Original criteria draw 2', async () => {
     const combinations = await generateCombinations(battlemageSiteDeck, battlemageCriteria, 2, false);
     const probability = deriveProbability(battlemageSiteDeck, combinations);
-    expect(combinations.length).toBe(33);
-    expect(probability).toBe(46.20689655172413);
+    expect(combinations.length).toBe(9);
+    expect(probability).toBe(7.586206896551724);
   });
-  // The rest of these were not corroborated by hand math
   test('Original criteria draw 3', async () => {
     const combinations = await generateCombinations(battlemageSiteDeck, battlemageCriteria, 3, false);
     const probability = deriveProbability(battlemageSiteDeck, combinations);
-    expect(combinations.length).toBe(1102);
-    expect(probability).toBe(0);
+    expect(combinations.length).toBe(60);
+    expect(probability).toBe(27.142857142857135);
   });
-
+  test('Original criteria draw 4', async () => {
+    const combinations = await generateCombinations(battlemageSiteDeck, battlemageCriteria, 4, false);
+    const probability = deriveProbability(battlemageSiteDeck, combinations);
+    expect(combinations.length).toBe(215);
+    expect(probability).toBe(50.129538405400545);
+  });
+  test('Original criteria draw 5', async () => {
+    const combinations = await generateCombinations(battlemageSiteDeck, battlemageCriteria, 5, false);
+    const probability = deriveProbability(battlemageSiteDeck, combinations);
+    expect(combinations.length).toBe(573);
+    expect(probability).toBe(68.48764262557295);
+  });
+  test('Original criteria draw 6', async () => {
+    const combinations = await generateCombinations(battlemageSiteDeck, battlemageCriteria, 6, false);
+    const probability = deriveProbability(battlemageSiteDeck, combinations);
+    expect(combinations.length).toBe(1264);
+    expect(probability).toBe(80.767125594711);
+  });
+  test('Original criteria draw 7', async () => {
+    const combinations = await generateCombinations(battlemageSiteDeck, battlemageCriteria, 7, false);
+    const probability = deriveProbability(battlemageSiteDeck, combinations);
+    expect(combinations.length).toBe(2436);
+    expect(probability).toBe(88.3867275763839);
+  });
 });
