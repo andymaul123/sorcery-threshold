@@ -1,5 +1,10 @@
 import { readFileSync, writeFileSync } from 'node:fs';
-import { wildCards } from './wild-cards.mjs';
+import { wildCards } from './data/wild-cards.mjs';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
 
 /**
  * Attempts to read card data from disk and transforms it into threshold data
@@ -7,7 +12,8 @@ import { wildCards } from './wild-cards.mjs';
  * @returns {Object.<string, string>} 
  */
 export function readAndTransformRawData(useWildCards) {
-  const cards = readFileSync('./sorcery-cards.json', 'utf8', (err, cards) => {
+  const pathName = path.join(__dirname, 'data', 'sorcery-cards.json');
+  const cards = readFileSync(pathName, 'utf8', (err, cards) => {
     if (err) throw err;
   });
 
@@ -46,8 +52,9 @@ export function readAndTransformRawData(useWildCards) {
  * @returns {void} 
  */
 export function writeParsedData(data) {
-  writeFileSync('threshold-data.json', JSON.stringify(data), 'utf8', () => {
-    console.log(`Writing contents to ./threshold-data.json`);
+  const pathName = path.join(__dirname, 'data', 'threshold-data.json');
+  writeFileSync(pathName, JSON.stringify(data), 'utf8', () => {
+    console.log(`Writing contents to ./data/-data.json`);
   });
 }
 
@@ -57,7 +64,8 @@ export function writeParsedData(data) {
  */
 export function getThresholdData() {
   try {
-      return readFileSync('./threshold-data.json', 'utf8', (err, data) => {
+      const pathName = path.join(__dirname, 'data', 'threshold-data.json');
+      return readFileSync(pathName, 'utf8', (err, data) => {
           return data;
         });
   } catch (error) {
@@ -70,7 +78,8 @@ export function getThresholdData() {
  */
 export function getListOfSites() {
   try {
-      return readFileSync('./list.txt', 'utf8', (err, data) => {
+    const pathName = path.join(__dirname, 'data', 'list.txt');
+      return readFileSync(pathName, 'utf8', (err, data) => {
           return data;
         });
   } catch (error) {
@@ -123,8 +132,9 @@ function normalizeName(name) {
  * @returns {void} 
  */
 export function saveCriteria(criteria) {
-  console.log(`Saving threshold criteria to ./criteria.json. Delete when done.`);
-  writeFileSync('criteria.json', JSON.stringify(criteria), 'utf8', () => {});
+  console.log(`Saving threshold criteria to ./data/criteria.json. Delete when done.`);
+  const pathName = path.join(__dirname, 'data', 'criteria.json');
+  writeFileSync(pathName, JSON.stringify(criteria), 'utf8', () => {});
 }
 
 /**
@@ -133,7 +143,8 @@ export function saveCriteria(criteria) {
  */
 export function loadCriteria() {
   try {
-      return readFileSync('./criteria.json', 'utf8', (err, data) => {return data;});
+      const pathName = path.join(__dirname, 'data', 'criteria.json');
+      return readFileSync(pathName, 'utf8', (err, data) => {return data;});
   } catch (error) {
       return undefined;
   }

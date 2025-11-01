@@ -133,5 +133,5 @@ dist
 .sass-cache
 
 # specific
-threshold-data.json
-criteria.json
+src/data/criteria.json
+src/data/threshold-data.json

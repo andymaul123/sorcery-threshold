@@ -9,9 +9,9 @@ import {
   saveCriteria, 
   loadCriteria
 } from "./source-data.mjs";
-import { generateCombinations } from './generate-combinations.mjs';
-import { deriveProbability } from "./derive-probability.mjs";
-import { simulateProbability } from "./simulate-probability.mjs";
+import { generateCombinations } from './recursive-combinator.mjs';
+import { deriveProbability } from "./probability.mjs";
+import { simulateProbability } from "./simulation.mjs";
 import { cleanTrailingFloatingPoint } from './utils.mjs';
 import { number } from '@inquirer/prompts';
 import chalk from 'chalk';
@@ -42,7 +42,6 @@ const options = {
 const { values: flags } = parseArgs({ args, options, allowPositionals: true });
 
 async function prompt() {
-  console.log(`Enter the desired threshold count for each element.`);
   let criteriaArray = [];
   const loadedCriteria = loadCriteria();
   if(loadedCriteria) {
@@ -50,6 +49,7 @@ async function prompt() {
     criteriaArray = JSON.parse(loadedCriteria);
   }
   else {
+    console.log(`Enter the desired threshold count for each element.`);
     const symbolEarth = '\u{1F703}';
     const symbolAir = '\u{1F701}';
     const symbolFire = '\u{1F702}';
@@ -69,17 +69,17 @@ async function prompt() {
         }
       }
     }
+    
     if(flags.save) {
       saveCriteria(criteriaArray.sort());
     }
   }
 
-
   init(criteriaArray.sort());
 }
 
 
-function init(criteria) {
+async function init(criteria) {
     // Step 1: Ensure there is threshold data to work with, otherwise create it using the provided sorcery-cards.json
     const thresholdData = getThresholdData();
     if(flags.forceNew || !thresholdData) {
@@ -103,21 +103,22 @@ function init(criteria) {
       throw new console.error(`Threshold criteria is missing; this is likely a bug`);
     }
 
-    const possibleSuccessCombinations = generateCombinations(criteria, siteDeckSymbols, flags.drawCount);
+    const drawCount = flags.drawCount ? flags.drawCount : 3;
+
+    const possibleSuccessCombinations = await generateCombinations(siteDeckSymbols, criteria, drawCount);
 
     // Step 4: Feed the possible success combinations into the probability equations
     let chance;
     if(flags.simulate) {
         console.log(`Simulating probability...`);
-        chance = simulateProbability(siteDeckSymbols, possibleSuccessCombinations, flags.iterations, flags.drawCount);
+        chance = simulateProbability(siteDeckSymbols, criteria, drawCount, flags.iterations);
     }
     else {
         console.log(`Calculating probability...`);
-        chance = deriveProbability(siteDeckSymbols, possibleSuccessCombinations, flags.drawCount);
+        chance = deriveProbability(siteDeckSymbols, possibleSuccessCombinations, drawCount);
     }
-
-    console.log(`Probability of getting ${criteria} in a draw of ${flags.drawCount ? flags.drawCount : criteria.length} is ${cleanTrailingFloatingPoint(chance)}%`);
-
+    
+    console.log(`Probability of getting ${criteria} in a draw of ${drawCount} is ${cleanTrailingFloatingPoint(chance)}%`);
 }
 
 prompt();

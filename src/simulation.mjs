@@ -1,21 +1,15 @@
+import { combinationValidator } from "./utils.mjs";
 /**
  * Runs a Monte Carlo simulation choosing random 'cards' from the provided site deck
  * @param {Array<string>} siteDeck
- * @param {Array<Array<string>>} successCombinations
+ * @param {Array<string>} criteria
+ * @param {number} drawCount
  * @param {number} [iterations]
- * @param {number} [draws]
  * @returns {number} 
  */
-export function simulateProbability(siteDeck, successCombinations, iterations = 1000, draws) {
-    const criteriaLength = successCombinations[0].length;
+export function simulateProbability(siteDeck, criteria, drawCount, iterations = 10000,) {
+    console.log(`Running ${iterations} simulations...`);
     let successCounter = 0;
-    const joinedSuccessArray = [];
-    const drawCount = draws ? draws : criteriaLength;
-
-    for (let index = 0; index < successCombinations.length; index++) {
-        joinedSuccessArray.push(successCombinations[index].join(","));
-    }
-
     // Run the simulation based on the iterations provided
     for (let i = 0; i < iterations; i++) {
         const proxiedSiteDeck = siteDeck.slice();
@@ -29,9 +23,8 @@ export function simulateProbability(siteDeck, successCombinations, iterations = 
             proxiedSiteDeck.splice(randomNumber, 1); 
         }
 
-        // Comparing strings is easier, so make a 'signature' of the symbols
-        const joinedPickedArray = pickedCards.sort().join(",");
-        if(joinedSuccessArray.includes(joinedPickedArray)) {
+       let pickedCardsSignature = pickedCards.join(',');
+        if(combinationValidator(pickedCardsSignature, criteria)) {
             successCounter++;
         }
     }
