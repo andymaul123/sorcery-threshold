@@ -1,19 +1,7 @@
 import { generateCombinations } from "../recursive-combinator.mjs";
 import { deriveProbability } from "../probability.mjs"; 
 import { cleanTrailingFloatingPoint } from "../utils.mjs";
-
-const siteDeckFourCards = ['a', 'e', 'f', 'w'];
-const battlemageSiteDeck = [
-  'a',   'a',  'a',  'a',  'a',
-  'a',   'ae', 'ae', 'ae', 'aef',
-  'aew', 'e',  'e',  'e',  'e',
-  'e',   'e',  'e',  'e',  'e',
-  'efw', 'ew', 'ew', 'ew', 'w',
-  'w',   'w',  'x',  'x',  'x'
-];
-const battlemageCriteria = ['a','e','e','w'];
-const siteDeckWildCards = ['aef', 'aew','aefw', 'x', 'y'];
-
+import { battlemageSiteDeck, battlemageCriteria, siteDeckFourCards, siteDeckWildCards } from './common.mjs';
 
 describe('Basic control tests for deriving probability', () => {
   test('One in four, 25%', async () => {

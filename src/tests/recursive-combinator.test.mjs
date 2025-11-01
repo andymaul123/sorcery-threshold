@@ -1,17 +1,5 @@
 import { generateCombinations, shouldResetPointers } from '../recursive-combinator.mjs';
-
-const siteDeckThirtyCards = ['a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e','f','w','a','e'];
-const siteDeckFourCards = ['a', 'e', 'f', 'w'];
-const siteDeckWildCards = ['aef', 'aew','aefw', 'x', 'y'];
-const battlemageSiteDeck = [
-  'a',   'a',  'a',  'a',  'a',
-  'a',   'ae', 'ae', 'ae', 'aef',
-  'aew', 'e',  'e',  'e',  'e',
-  'e',   'e',  'e',  'e',  'e',
-  'efw', 'ew', 'ew', 'ew', 'w',
-  'w',   'w',  'x',  'x',  'x'
-];
-const battlemageCriteria = ['a','e','e','w'];
+import { battlemageSiteDeck, battlemageCriteria, siteDeckThirtyCards, siteDeckFourCards, siteDeckWildCards } from './common.mjs';
 
 describe('Basic control tests for generating combinations with filtering', () => {
   test('Generate combinations: 1 out of 4 match', async () => {

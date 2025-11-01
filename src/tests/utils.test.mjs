@@ -1,4 +1,5 @@
 import { cleanTrailingFloatingPoint, binomialCoefficient, createInitialPointerArray, createFrequencyMap, extractStringSection, combinationValidator } from "../utils.mjs";
+import { battlemageCriteria } from './common.mjs';
 
 describe('Tests for binomialCoefficient', () => {
   test('binomialCoefficient returns 2 combinations from 2/1', () => {
