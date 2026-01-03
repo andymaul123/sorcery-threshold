@@ -21,12 +21,13 @@ You must provide a list.txt file containing the sites in your deck in the format
 Feel free to use the included list.txt as a template.
 
 ## How To Use
+`nvm use`
 
 `npm install`
 
 `node src/index.mjs`
 
-This will run the 'base' version of the tool using the dataset of Beta and Arthurian Legends sets provided by the Sorcery API.
+This will run the 'base' version of the tool using the dataset of Beta, Arthurian Legends, Dragonlord, and Gothic sets provided by the Sorcery API.
 
 You will be prompted to provide the criteria in terms of symbols needed. The tool will then perform a [multivariate hypergeometric distribution](https://en.wikipedia.org/wiki/Hypergeometric_distribution#Multivariate_hypergeometric_distribution) calculation to provide the probability of getting that criteria in the same number of cards drawn.
 
@@ -47,4 +48,8 @@ You will be prompted to provide the criteria in terms of symbols needed. The too
 `npm test` will run `src/tests/integration.test.mjs` as the default behavior. This checks both simulated and derived probability for a static data set.
 
 `npm run testAll` will run a much larger set of tests and take longer to complete.
+
+## Updating
+
+When a new set comes out, download new card data from [Sorcery API](https://api.sorcerytcg.com/). Replace the old sorcery-cards.json file. Manually edit the wild-cards.mjs file with any sites that may conditionally provide all four elements threshold.
 
