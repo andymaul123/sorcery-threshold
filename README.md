@@ -25,7 +25,7 @@ Feel free to use the included list.txt as a template.
 
 `npm install`
 
-`node src/index.mjs`
+`npm run start`
 
 This will run the 'base' version of the tool using the dataset of Beta, Arthurian Legends, Dragonlord, and Gothic sets provided by the Sorcery API.
 

@@ -115,7 +115,7 @@ async function init(criteria) {
     }
     else {
         console.log(`Calculating probability...`);
-        chance = deriveProbability(siteDeckSymbols, possibleSuccessCombinations, drawCount);
+        chance = deriveProbability(siteDeckSymbols, possibleSuccessCombinations);
     }
     
     console.log(`Probability of getting ${criteria} in a draw of ${drawCount} is ${cleanTrailingFloatingPoint(chance)}%`);

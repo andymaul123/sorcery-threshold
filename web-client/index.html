@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello, world!</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="" />
+  <link rel="icon" href="favicon.png">
+
+</head>
+<body>
+  <h1>Sorcery Threshold Calculator</h1>
+  
+
+  <form>
+    <label for="decklist">Atlas List</label>
+    <textarea id="decklist"></textarea>
+    <label for="earth">Earth</label>
+    <input type="number" id="earth" name="earth" min="0" max="10" value="0" />
+    <label for="air">Air</label>
+    <input type="number" id="air" name="air" min="0" max="10" value="0"/>
+    <label for="fire">Fire</label>
+    <input type="number" id="fire" name="fire" min="0" max="10" value="0"/>
+    <label for="water">Water</label>
+    <input type="number" id="water" name="water" min="0" max="10" value="0"/>
+    <label for="draws">Draws</label>
+    <input type="number" id="draws" name="draws" min="1" max="7" value="3"/>
+    <button id="generate">Generate</button>
+  </form>
+  <p id="output"></p>
+  <script type="text/javascript" src="./scripts.js"></script>
+</body>
+</html>

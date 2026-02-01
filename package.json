@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "main": "src/index.mjs",
   "scripts": {
+    "start": "NODE_OPTIONS='--experimental-vm-modules' node src/index.mjs",
     "test" : "NODE_OPTIONS='--experimental-vm-modules' npx jest src/tests/integration.test.mjs",
     "testAll": "NODE_OPTIONS='--experimental-vm-modules' npx jest src/tests"
   },
